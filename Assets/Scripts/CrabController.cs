@@ -23,14 +23,22 @@ public class CrabController : MonoBehaviour
     public float speed = 5f;
     public float turnSmoothTime = 0.2f;
     protected float turnSmoothVel;
+    //[HideInInspector]
+    public Rigidbody rb;
 
     //DELAYS
     private bool hittable = false;
     private float hitDelay = 0.1f;
 
 
+
+    protected virtual void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
+
     // Update is called once per frame
-    protected virtual void Update()
+    protected virtual void FixedUpdate()
     {
         Move();
     }

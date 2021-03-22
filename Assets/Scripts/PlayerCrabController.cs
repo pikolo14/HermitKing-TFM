@@ -4,13 +4,17 @@ using UnityEngine;
 
 public class PlayerCrabController : CrabController
 {
-    public CharacterController charContr;
     public Camera cam;
 
 
-    protected override void Update()
+    protected override void Awake()
     {
-        base.Update();
+        base.Awake();
+    }
+
+    protected override void FixedUpdate()
+    {
+        base.FixedUpdate();
     }
 
     public void OnCollisionEnter(Collision collision)
@@ -22,24 +26,24 @@ public class PlayerCrabController : CrabController
         }
     }
 
-    //Mover el cangrejo mediante inputs
     protected override void Move()
     {
         //Rotar cangrejo para encajar en la dirección de la cámara en cierto tiempo
         float targetAngle = cam.transform.eulerAngles.y;
         float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVel, turnSmoothTime);
-        transform.rotation = Quaternion.Euler(0f, angle, 0f);
+        rb.MoveRotation(Quaternion.Euler(0f, angle, 0f));
 
         //Desplazar cangrejo en función de su rotación actual y del joystick
         float xMove = Input.GetAxisRaw("Horizontal");
         float zMove = Input.GetAxisRaw("Vertical");
         Vector3 dir = new Vector3(xMove, 0, zMove).normalized;
-        if(dir.magnitude >= 0.1f)
+        if (dir.magnitude >= 0.1f)
         {
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * dir;
-            charContr.Move(moveDir.normalized *speed *Time.deltaTime); 
+            rb.MovePosition(rb.position + moveDir * speed * Time.fixedDeltaTime);
         }
     }
+
 
     protected override void Defeat()
     {
