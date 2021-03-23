@@ -7,6 +7,18 @@ public class Globals : MonoBehaviour
     //GLOBAL VARIABLES
 
 
+
+    //TAGS
+    public static string tagPlayer = "Player";
+    public static string tagEnemy = "Enemy";
+    public static string tagAttack = "Attack";
+
+    //INPUTS
+    public static string inputAttack = "Attack";
+    public static string inputDefence = "Defence";
+
+
+
     //GLOBAL FUNCTIONS
 
     //Generación de puntos en una zona asegurando cierta distancia entre cada punto. Crea una rejilla y solo permite que haya un punto en cada celda. 

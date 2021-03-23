@@ -4,12 +4,30 @@ using UnityEngine;
 
 public class PlayerCrabController : CrabController
 {
+    public static PlayerCrabController player;
     public Camera cam;
 
 
     protected override void Awake()
     {
         base.Awake();
+
+        //Referencia estática singleton de nuestro jugador
+        if (player == null)
+            player = this;
+        else
+            Destroy(player);
+    }
+
+    private void Update()
+    {
+        if(!attackContr.IsAttacking() && !defending)
+        {
+            if(Input.GetButtonDown(Globals.inputAttack))
+                attackContr.Attack();
+            else if (Input.GetButtonDown(Globals.inputDefence))
+                Defence();
+        }
     }
 
     protected override void FixedUpdate()

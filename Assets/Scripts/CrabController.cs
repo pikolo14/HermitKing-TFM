@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CrabController : MonoBehaviour
 {
+    protected  AttackController attackContr;
 
     //CONCHA
     [HideInInspector]
@@ -15,7 +16,7 @@ public class CrabController : MonoBehaviour
     [Header("Stats")]
     public float size;
     public int health;
-    public int attack;
+    
     public float shellWeight;
 
     //MOVIMIENTO
@@ -27,14 +28,52 @@ public class CrabController : MonoBehaviour
     public Rigidbody rb;
 
     //DELAYS
-    private bool hittable = false;
-    private float hitDelay = 0.1f;
+    protected bool hittable = true;
+    protected float hitDelay = 0.1f;
+    private float attackCurrDelay = 0;
+    public float attackMinDelay = 1, attackMaxDelay = 4;
+
+    //DETECCION DEL JUGADOR
+    [Header("Player detection")]
+    public float attackDist = 1;
+    public float detectDist = 5;
+    public float detectAngle = 40;
+
+    //DEFENSA
+    public float defenceDuration = 0.5f;
+    protected bool defending = false;
 
 
 
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        attackContr = GetComponentInChildren<AttackController>();
+        shell = GetComponentInChildren<ShellController>();
+        hittable = true;
+    }
+
+    private void Update()
+    {
+        float dist = Vector3.Distance(PlayerCrabController.player.transform.position, transform.position);
+
+        //El enemigo está en el rango de vision?
+        //TODO
+
+        //Ataca si no se está atacando...
+        if(!attackContr.IsAttacking())
+        {
+            //...y si el jugador está lo suficientemente cerca y el ataque no esta en cooldown
+            if (dist < attackDist && attackCurrDelay <= 0)
+            {
+                attackContr.Attack();
+                Debug.Log("Ataca enemigo");
+                //Delay random en un rango para el siguiente ataque automático
+                attackCurrDelay = Random.Range(attackMinDelay, attackMaxDelay);
+            }
+            else
+                attackCurrDelay -= Time.deltaTime;
+        }
     }
 
     // Update is called once per frame
@@ -42,6 +81,7 @@ public class CrabController : MonoBehaviour
     {
         Move();
     }
+    
 
     //Mover el cangrejo mediante IA
     protected virtual void Move()
@@ -49,12 +89,19 @@ public class CrabController : MonoBehaviour
         //TODO: Comportamiento movimiento cangrejos IA
     }
 
+    
     //Recibir un golpe y perder vida
     public void GetHit(int attack)
     {
-        //Si se le puede golpear...
-        if(hittable)
+        //Si se está defendiendo se esquiva el golpe
+        if(defending)
         {
+            Debug.Log("DEFENSA UH UH");
+        }
+        //Si se le puede golpear...
+        else if(hittable)
+        {
+            Debug.Log("Hit: "+attack);
             //Si tiene concha pierde los puntos de vida del ataque del enemigo
             if(shell != null)
             {
@@ -91,6 +138,30 @@ public class CrabController : MonoBehaviour
         yield return new WaitForSeconds(hitDelay);
         hittable = true;
     }
+
+    //Activar defensa temporalmente
+    public void Defence()
+    {
+        if(!attackContr.IsAttacking() && !defending)
+        {
+            StartCoroutine(DefenceDuration(defenceDuration));
+        }
+    }
+
+    protected IEnumerator DefenceDuration(float time)
+    {
+        defending = true;
+        //TODO: Aimación de defensa
+
+        Material mat = GetComponentInChildren<Renderer>().material;
+        Color prev = mat.color;
+        mat.color = Color.blue;
+        yield return new WaitForSeconds(time);
+
+        mat.color = prev;
+        defending = false;
+    }
+
 
     //Coger una nueva concha
     public void GetShell(ShellController _shell)

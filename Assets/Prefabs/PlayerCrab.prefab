@@ -1,5 +1,64 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1394975948
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1394975949}
+  - component: {fileID: 1394975950}
+  - component: {fileID: 1394975951}
+  m_Layer: 0
+  m_Name: AttackController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1394975949
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394975948}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 5566167572344910733}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1394975950
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394975948}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.5170965, y: 0.68048763, z: 1.026084}
+  m_Center: {x: 0, y: 0.31569052, z: 0.9529326}
+--- !u!114 &1394975951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394975948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f39fbbbb4c894d04a81a28a3b321aac7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackDamage: 1
+  attackDuration: 0.5
 --- !u!1 &5566167572265386296
 GameObject:
   m_ObjectHideFlags: 0
@@ -104,9 +163,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5566167572344910733}
-  - component: {fileID: 5566167572344910707}
   - component: {fileID: 5566167572344910732}
   - component: {fileID: -8668102216834762503}
+  - component: {fileID: 1278025539}
   m_Layer: 0
   m_Name: PlayerCrab
   m_TagString: Player
@@ -121,33 +180,16 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5566167572344910734}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 5566167572826117870}
   - {fileID: 5566167574115474066}
+  - {fileID: 1394975949}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!143 &5566167572344910707
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5566167572344910734}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 0.36
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.46, z: 0.52}
 --- !u!114 &5566167572344910732
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,11 +205,15 @@ MonoBehaviour:
   shell: {fileID: 0}
   size: 0
   health: 0
-  attack: 0
   shellWeight: 0
   speed: 5
   turnSmoothTime: 0.2
-  charContr: {fileID: 5566167572344910707}
+  rb: {fileID: 0}
+  attackMinDelay: 1
+  attackMaxDelay: 4
+  attackDist: 1
+  detectDist: 5
+  detectAngle: 40
   cam: {fileID: 0}
 --- !u!54 &-8668102216834762503
 Rigidbody:
@@ -185,6 +231,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!65 &1278025539
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566167572344910734}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.2023937, y: 1.3256559, z: 1.7105137}
+  m_Center: {x: 0, y: 0.60789204, z: 0}
 --- !u!1 &5566167572826117871
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,6 +352,7 @@ GameObject:
   - component: {fileID: 5566167574115474071}
   - component: {fileID: 5566167574115474064}
   - component: {fileID: 5566167574115474065}
+  - component: {fileID: 298847450}
   m_Layer: 0
   m_Name: Shell
   m_TagString: Untagged
@@ -376,3 +436,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &298847450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566167574115474067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f7d2b145345a7c4684ba44f20a7c455, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 0
+  weight: 0
+  minSize: 0
+  maxSize: 0
