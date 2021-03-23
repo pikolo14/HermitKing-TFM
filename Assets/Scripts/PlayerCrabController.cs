@@ -1,11 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using Cinemachine;
+
 
 public class PlayerCrabController : CrabController
 {
+    [SerializeField]
+    public CrabActions inputActions;
+
     public static PlayerCrabController player;
     public Camera cam;
+
+    private Vector2 inputMove = new Vector2(), lookCamera = new Vector2();
+    public float deadZoneX = 0.2f;
 
 
     protected override void Awake()
@@ -17,17 +26,26 @@ public class PlayerCrabController : CrabController
             player = this;
         else
             Destroy(player);
+
+        //Asignamos las funciones a los eventos de nuestro new input system
+        inputActions = new CrabActions();
+        inputActions.Game.Move.performed += ctx => { inputMove = ctx.ReadValue<Vector2>(); };
+        inputActions.Game.Look.performed += ctx => { lookCamera = ctx.ReadValue<Vector2>().normalized; };
+        inputActions.Game.Look.performed += ctx => GetInput();
+        inputActions.Game.Attack.performed += ctx => attackContr.Attack();
+        inputActions.Game.Defence.performed += ctx => Defence();
+        inputActions.Game.DropShell.performed += ctx => DropShell();
     }
 
     private void Update()
     {
-        if(!attackContr.IsAttacking() && !defending)
-        {
-            if(Input.GetButtonDown(Globals.inputAttack))
-                attackContr.Attack();
-            else if (Input.GetButtonDown(Globals.inputDefence))
-                Defence();
-        }
+        //if(!attackContr.IsAttacking() && !defending)
+        //{
+        //    if(Input.GetButtonDown(Globals.inputAttack))
+        //        attackContr.Attack();
+        //    else if (Input.GetButtonDown(Globals.inputDefence))
+        //        Defence();
+        //}
     }
 
     protected override void FixedUpdate()
@@ -52,8 +70,8 @@ public class PlayerCrabController : CrabController
         rb.MoveRotation(Quaternion.Euler(0f, angle, 0f));
 
         //Desplazar cangrejo en función de su rotación actual y del joystick
-        float xMove = Input.GetAxisRaw("Horizontal");
-        float zMove = Input.GetAxisRaw("Vertical");
+        float xMove = inputMove.x;//Input.GetAxisRaw("Horizontal");
+        float zMove = inputMove.y; //Input.GetAxisRaw("Vertical");
         Vector3 dir = new Vector3(xMove, 0, zMove).normalized;
         if (dir.magnitude >= 0.1f)
         {
@@ -83,5 +101,44 @@ public class PlayerCrabController : CrabController
         }
 
         //TODO: Aumentar escala del cuerpo del cangrejo
+    }
+
+
+
+
+    //***** FIXES CINEMACHINE + NEW INPUT SYSTEM *****
+    private void OnEnable()
+    {
+        inputActions.Game.Enable();
+    }
+
+    private void OnDisable()
+    {
+        inputActions.Game.Enable();
+    }
+
+    private void GetInput()
+    {
+        CinemachineCore.GetInputAxis = GetAxisCustom;
+    }
+
+    public float GetAxisCustom(string axisName)
+    {
+        // LookCamera.Normalize();
+
+        if (axisName == "Camera X")
+        {
+            if (lookCamera.x > deadZoneX || lookCamera.x < -deadZoneX) // To stabilise Cam and prevent it from rotating when LookCamera.x value is between deadZoneX and - deadZoneX
+            {
+                return lookCamera.x;
+            }
+        }
+
+        else if (axisName == "Camera Y")
+        {
+            return lookCamera.y;
+        }
+
+        return 0;
     }
 }

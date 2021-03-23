@@ -76,13 +76,13 @@ public class CrabController : MonoBehaviour
         }
     }
 
+
     // Update is called once per frame
     protected virtual void FixedUpdate()
     {
         Move();
     }
     
-
     //Mover el cangrejo mediante IA
     protected virtual void Move()
     {
@@ -123,6 +123,14 @@ public class CrabController : MonoBehaviour
         }
     }
 
+    //Mantener un tiempo como intocable despues de ser golpeado para evitar golpes seguidos injustos
+    IEnumerator HitDelay()
+    {
+        hittable = false;
+        yield return new WaitForSeconds(hitDelay);
+        hittable = true;
+    }
+
     //Muerte del cangrejo
     protected virtual void Defeat()
     {
@@ -131,13 +139,6 @@ public class CrabController : MonoBehaviour
         //TODO
     }
 
-    //Mantener un tiempo como intocable despues de ser golpeado para evitar golpes seguidos injustos
-    IEnumerator HitDelay()
-    {
-        hittable = false;
-        yield return new WaitForSeconds(hitDelay);
-        hittable = true;
-    }
 
     //Activar defensa temporalmente
     public void Defence()
@@ -162,7 +163,6 @@ public class CrabController : MonoBehaviour
         defending = false;
     }
 
-
     //Coger una nueva concha
     public void GetShell(ShellController _shell)
     {
@@ -175,17 +175,18 @@ public class CrabController : MonoBehaviour
             //TODO: Poner concha en la espalda
         }
     }
-
-    public void UpdateSpeed()
-    {
-        //TODO: Cambiar velocidad de agente en función de weight y speed
-    }
-
+    
     //Dejar la concha equipada en el sitio
     public void DropShell()
     {
         shellWeight = 0;
         //TODO: Dejar caer objeto concha
         shell = null;
+    }
+
+    //Actualizar velocidad
+    public void UpdateSpeed()
+    {
+        //TODO: Cambiar velocidad de agente en función de weight y speed
     }
 }
