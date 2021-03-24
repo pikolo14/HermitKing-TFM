@@ -4,44 +4,54 @@ using UnityEngine;
 
 public class CrabController : MonoBehaviour
 {
-    protected  AttackController attackContr;
+    protected AttackController attackContr;
+    protected Rigidbody rb;
 
+    //SALUD
+    [Header("HEALTH")]
+    public int health;
+
+    //TAMAÑO
+    [Header("SIZE")]
+    public float size;
+    protected Vector3 initBodyScale;
+    protected Transform body;
+    
     //CONCHA
+    [Header("SHELL")]
+    public Transform shellPoint;
     [HideInInspector]
     public ShellController shell;
     public static float disconfortFactor = 0.5f;
     protected float discomfort = 0;
 
-    //STATS
-    [Header("Stats")]
-    public float size;
-    public int health;
-    
-    public float shellWeight;
-
-    //MOVIMIENTO
-    [Header("Movement")]
+    //MOVIMIENTO y HABILIDADES
+    [Header("MOVEMENT AND SKILLS")]
     public float speed = 5f;
     public float turnSmoothTime = 0.2f;
     protected float turnSmoothVel;
-    //[HideInInspector]
-    public Rigidbody rb;
+    protected bool defending = false;
+
+    //PESO
+    [Header("WEIGHT")]
+    public float shellWeight = 0;
+    public float maxWeight = 10;
+    public float minSpeedMult = 0.2f, maxSpeedMult = 1f;
+    protected float speedWeightFactor = 1;
 
     //DELAYS
+    [Header("DELAYS/DURATIONS")]
     protected bool hittable = true;
     protected float hitDelay = 0.1f;
     private float attackCurrDelay = 0;
     public float attackMinDelay = 1, attackMaxDelay = 4;
+    public float defenceDuration = 0.5f;
 
     //DETECCION DEL JUGADOR
-    [Header("Player detection")]
+    [Header("IA DETECTION")]
     public float attackDist = 1;
     public float detectDist = 5;
     public float detectAngle = 40;
-
-    //DEFENSA
-    public float defenceDuration = 0.5f;
-    protected bool defending = false;
 
 
 
@@ -50,7 +60,16 @@ public class CrabController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         attackContr = GetComponentInChildren<AttackController>();
         shell = GetComponentInChildren<ShellController>();
+        body = transform.GetChild(0);
+
         hittable = true;
+        initBodyScale = body.localScale;
+        UpdateSpeed();
+    }
+    protected void Start()
+    {
+        //Inicializamos el tamaño para que inicialmente  al multiplicar por el factor se obtenga la escala original
+        size = 1 / GameManager.gameManager.scaleFactor;
     }
 
     private void Update()
@@ -67,7 +86,6 @@ public class CrabController : MonoBehaviour
             if (dist < attackDist && attackCurrDelay <= 0)
             {
                 attackContr.Attack();
-                Debug.Log("Ataca enemigo");
                 //Delay random en un rango para el siguiente ataque automático
                 attackCurrDelay = Random.Range(attackMinDelay, attackMaxDelay);
             }
@@ -101,7 +119,7 @@ public class CrabController : MonoBehaviour
         //Si se le puede golpear...
         else if(hittable)
         {
-            Debug.Log("Hit: "+attack);
+            //Debug.Log("Hit: "+attack);
             //Si tiene concha pierde los puntos de vida del ataque del enemigo
             if(shell != null)
             {
@@ -168,25 +186,38 @@ public class CrabController : MonoBehaviour
     {
         if(_shell.GetDisconfort(size) == 0)
         {
-            shell = _shell;
-            health = shell.health;
-            shellWeight = shell.weight;
-
-            //TODO: Poner concha en la espalda
+            //Asociamos la concha al cangrejo y la ponemos en un punto en la espalda
+            //Si hace poco que la hemos soltado, no nos permitirá cogerla
+            if(_shell.PickUp(transform, shellPoint))
+            {
+                //Pasamos sus stats al cangrejo
+                shell = _shell;
+                health = shell.health;
+                shellWeight = shell.weight;
+                UpdateSpeed();
+            }
         }
     }
     
     //Dejar la concha equipada en el sitio
     public void DropShell()
     {
-        shellWeight = 0;
-        //TODO: Dejar caer objeto concha
-        shell = null;
+        if(shell!=null)
+        {
+            //Quitamos las stats que ofrecia la concha al cangrejo
+            shellWeight = 0;
+            health = 0;
+            UpdateSpeed();
+
+            //Dejar caer objeto concha
+            shell.Drop();
+            shell = null;
+        }
     }
 
-    //Actualizar velocidad
+    //Actualizar velocidad en función del peso de la concha
     public void UpdateSpeed()
     {
-        //TODO: Cambiar velocidad de agente en función de weight y speed
+        speedWeightFactor = 1 - (shellWeight / maxWeight) * (maxSpeedMult - minSpeedMult) + minSpeedMult;
     }
 }

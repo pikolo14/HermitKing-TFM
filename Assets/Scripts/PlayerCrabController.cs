@@ -9,12 +9,15 @@ public class PlayerCrabController : CrabController
 {
     [SerializeField]
     public CrabActions inputActions;
+    public CinemachineFreeLook cmCamera;
 
     public static PlayerCrabController player;
     public Camera cam;
 
+    //Controles de la camara
     private Vector2 inputMove = new Vector2(), lookCamera = new Vector2();
     public float deadZoneX = 0.2f;
+    private float[] orbitsRads, orbitsHeights;
 
 
     protected override void Awake()
@@ -35,17 +38,20 @@ public class PlayerCrabController : CrabController
         inputActions.Game.Attack.performed += ctx => attackContr.Attack();
         inputActions.Game.Defence.performed += ctx => Defence();
         inputActions.Game.DropShell.performed += ctx => DropShell();
+
+        //Almacenamos los datos iniciales de las orbitas de la camara
+        orbitsHeights = new float[cmCamera.m_Orbits.Length];
+        orbitsRads = new float[cmCamera.m_Orbits.Length];
+
+        for (int i = 0; i < cmCamera.m_Orbits.Length; i++)
+        {
+            orbitsHeights[i] = cmCamera.m_Orbits[i].m_Height;
+            orbitsRads[i] = cmCamera.m_Orbits[i].m_Radius;
+        }
     }
 
     private void Update()
     {
-        //if(!attackContr.IsAttacking() && !defending)
-        //{
-        //    if(Input.GetButtonDown(Globals.inputAttack))
-        //        attackContr.Attack();
-        //    else if (Input.GetButtonDown(Globals.inputDefence))
-        //        Defence();
-        //}
     }
 
     protected override void FixedUpdate()
@@ -55,10 +61,16 @@ public class PlayerCrabController : CrabController
 
     public void OnCollisionEnter(Collision collision)
     {
-        if(collision.collider.tag == "Food")
+        //Comer
+        if(collision.collider.CompareTag(Globals.tagFood))
         {
-            Eat(0.5f);
+            Eat(GameManager.gameManager.foodSizeIncr);
             Destroy(collision.collider.gameObject);
+        }
+        //Coger concha si no tenemos una ya equipada
+        else if(collision.collider.CompareTag(Globals.tagShell) && shell==null)
+        {
+            GetShell(collision.collider.GetComponent<ShellController>());
         }
     }
 
@@ -76,7 +88,7 @@ public class PlayerCrabController : CrabController
         if (dir.magnitude >= 0.1f)
         {
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * dir;
-            rb.MovePosition(rb.position + moveDir * speed * Time.fixedDeltaTime);
+            rb.MovePosition(rb.position + moveDir * speed * speedWeightFactor * Time.fixedDeltaTime);
         }
     }
 
@@ -87,22 +99,41 @@ public class PlayerCrabController : CrabController
         //TODO
     }
 
-    //Aumentamos el tamaño al comer X cantidad
+    //Aumentamos el tamaño al comer
     public void Eat(float sizeIncrease)
     {
         size += sizeIncrease;
-        Debug.Log("Size player: " + size);
+        UpdateCrabSize();
 
         //Si lo incomoda que es la concha supera a la vida que le queda, se suelta la concha
-        discomfort = shell.GetDisconfort(size);
-        if(discomfort >= health)
+        if(shell != null)
         {
-            DropShell();
+            discomfort = shell.GetDisconfort(size);
+            if(discomfort >= health)
+                DropShell();
         }
-
-        //TODO: Aumentar escala del cuerpo del cangrejo
     }
 
+    //Actualizar tamaño de escala del modelo del cangrejo
+    public void UpdateCrabSize()
+    {
+        body.localScale = initBodyScale * size * GameManager.gameManager.scaleFactor;
+        //TODO: ¿Actualizar posición del caparazón teniendo en cuenta tamaño de cangrejo y de caparazon?
+
+        //Alejar camara conforme crezca con la propoción del tamaño actual respecto al inicial para aplicarlo a los orbits
+        float prop = body.localScale.x / initBodyScale.x;
+        UpdateCameraZoom(prop);
+    }
+
+    //Alejar camara conforme crezca agrandando los orbits de la camara de cinemachine
+    public void UpdateCameraZoom(float prop)
+    {
+        for(int i = 0; i< cmCamera.m_Orbits.Length; i++)
+        {
+            cmCamera.m_Orbits[i].m_Height = orbitsHeights[i]*prop;
+            cmCamera.m_Orbits[i].m_Radius = orbitsRads[i]*prop;
+        }
+    }
 
 
 

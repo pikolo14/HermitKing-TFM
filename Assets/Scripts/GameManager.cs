@@ -4,13 +4,36 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager gameManager;
+
     //Spawn de comida, conchas y enemigos
+    [Header("SPAWNS")]
     public Collider spawnZoneColl;
-    public GameObject foodPrefab, enemyPrefab, shellPrefab;
+    public GameObject foodPrefab, enemyPrefab;
+    public GameObject[] shellPrefabs;
     public float distBetweenSpawns = 2f;
     public float enemyProportion = 0.06f;
     public float shellProportion = 0.04f;
+    public float foodSizeIncr = 0.1f;
 
+    public float scaleFactor = 0.5f; //Escala incrementada por unidad de size (cangrejos y conchas)
+
+    [Header("SHELLS")]
+    public float shellSizeTolerance = 0.5f;
+    public float minShellSize = 0, maxShellSize = 10;
+
+
+    private void Awake()
+    {
+        if(gameManager == null)
+        {
+            gameManager = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -37,9 +60,12 @@ public class GameManager : MonoBehaviour
         int nEnemies = Mathf.FloorToInt(points2D.Count * enemyProportion);
         SpecialSpawn(nEnemies, enemyPrefab, ref points2D, bounds);
 
-        //Generar conchas
-        int nShells = Mathf.FloorToInt(points2D.Count * shellProportion);
-        SpecialSpawn(nShells, shellPrefab, ref points2D, bounds);
+        //Generar conchas de distintos tipos a partes iguales
+        int nShells = Mathf.FloorToInt(points2D.Count * shellProportion /shellPrefabs.Length);
+        foreach(GameObject shell in shellPrefabs)
+        {
+            SpecialSpawn(nShells, shell, ref points2D, bounds);
+        }
 
         //Generar comida con el resto de puntos
         foreach (Vector2 point in points2D)

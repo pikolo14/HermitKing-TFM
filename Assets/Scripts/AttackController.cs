@@ -1,4 +1,4 @@
-using System.Collections;
+                        using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -61,13 +61,13 @@ public class AttackController : MonoBehaviour
         //Si estamos en un enemigo y entramos en el cuerpo del jugador, dañamos al jugador
         if (enemy && other.CompareTag(Globals.tagPlayer))
         {
-            PlayerCrabController player = other.GetComponent<PlayerCrabController>();
+            PlayerCrabController player = other.GetComponentInParent<PlayerCrabController>();
             player.GetHit(attackDamage);
         }
         //Si estamos en el cangrejo del jugador y entramos en el cuerpo de un enemigo, lo dañamos
         else if (!enemy && other.CompareTag(Globals.tagEnemy))
         {
-            CrabController enemy = other.GetComponent<CrabController>();
+            CrabController enemy = other.GetComponentInParent<CrabController>();
             enemy.GetHit(attackDamage);
         }
     }

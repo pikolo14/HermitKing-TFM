@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Food
   - Enemy
+  - Shell
   layers:
   - Default
   - TransparentFX
