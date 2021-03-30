@@ -6,7 +6,7 @@ public class AttackController : MonoBehaviour
 {
     private Collider coll;
     private CrabController controller;
-    private bool enemy;
+    private bool enemy = false;
 
     public int attackDamage = 1;
     public float attackDuration = 0.5f;
@@ -18,12 +18,21 @@ public class AttackController : MonoBehaviour
         coll.enabled = false;
 
         //Asignamos el componente controlador del cangrejo en funcion de si está asignado al cangrejo principal o a enemigos
-        controller = GetComponentInParent<CrabController>();
-
-        if (transform.parent.gameObject == PlayerCrabController.player.gameObject)
+        controller = GetComponentInParent<PlayerCrabController>();
+        if(controller != null)
+        {
             enemy = false;
+        }
         else
+        {
+            controller = GetComponentInParent<CrabController>();
             enemy = true;
+        }
+
+        //if (transform.parent.gameObject == PlayerCrabController.player.gameObject)
+        //    enemy = false;
+        //else
+        //    enemy = true;
     }
 
     //Atacamos si no se está atacando

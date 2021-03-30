@@ -12,19 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9a327e526919ef4ab71409958655dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shell: {fileID: 0}
-  size: 0
   health: 2
-  shellWeight: 0
+  size: 0
+  shellPoint: {fileID: 0}
+  shell: {fileID: 0}
   speed: 5
   turnSmoothTime: 0.2
-  rb: {fileID: 0}
+  shellWeight: 0
+  maxWeight: 10
+  minSpeedMult: 0.2
+  maxSpeedMult: 1
   attackMinDelay: 1
   attackMaxDelay: 4
+  defenceDuration: 0.5
   attackDist: 2.5
   detectDist: 5
   detectAngle: 40
-  defenceDuration: 0.5
 --- !u!1001 &9097558883234345445
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32,6 +35,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1394975948, guid: 334c1ea02dc60ce48a5a60364a7a9bc5, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 5566167572265386301, guid: 334c1ea02dc60ce48a5a60364a7a9bc5, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -96,6 +103,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: d527a2f2b6152084384b04926369d4ac, type: 2}
+    - target: {fileID: 6776043947921888874, guid: 334c1ea02dc60ce48a5a60364a7a9bc5, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5566167572344910732, guid: 334c1ea02dc60ce48a5a60364a7a9bc5, type: 3}
     - {fileID: 5566167572344910707, guid: 334c1ea02dc60ce48a5a60364a7a9bc5, type: 3}

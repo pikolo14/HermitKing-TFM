@@ -119,7 +119,7 @@ public class CrabController : MonoBehaviour
         //Si se le puede golpear...
         else if(hittable)
         {
-            //Debug.Log("Hit: "+attack);
+            Debug.Log("Hit: "+attack);
             //Si tiene concha pierde los puntos de vida del ataque del enemigo
             if(shell != null)
             {
