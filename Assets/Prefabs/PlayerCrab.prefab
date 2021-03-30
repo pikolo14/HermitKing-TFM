@@ -134,6 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f63a0cd1499aa24f8d499ae0ba240ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 0}
   health: 0
   size: 2
   shellPoint: {fileID: 1140307707}
@@ -146,7 +147,7 @@ MonoBehaviour:
   maxSpeedMult: 1
   attackMinDelay: 1
   attackMaxDelay: 4
-  defenceDuration: 1
+  defenceDuration: 0.6
   attackDist: 1
   detectDist: 5
   detectAngle: 40
@@ -182,6 +183,25 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.018055687, y: 0.019674838, z: 0.04863464}
   m_Center: {x: 0, y: 0.0036661266, z: -0.0100455675}
+--- !u!95 &4490268932104800933
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6776043947921888874}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 0e2088eb90ed4d84e89aa2b14251ec61, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1001 &5965072408067763003
 PrefabInstance:
   m_ObjectHideFlags: 0

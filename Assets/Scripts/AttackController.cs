@@ -45,15 +45,19 @@ public class AttackController : MonoBehaviour
     //Animación de ataque y activacion de collider de ataque
     public IEnumerator AttackDuration(float duration)
     {
-        //TODO: Animacion de ataque
+        //Animacion de ataque
+        controller.animator.SetBool(Globals.inputAttack, true);
+        yield return new WaitForSeconds(0.4f);
 
         //Activamos el collider de ataque
         coll.enabled = true;
+        //DEBUG
         Material mat = transform.parent.GetComponentInChildren<Renderer>().material;
         Color prev = mat.color;
         mat.color = Color.red;
 
-        yield return new WaitForSeconds(duration);
+        //Desactivamos el collider
+        yield return new WaitForSeconds(0.35f);
         mat.color = prev;
         coll.enabled = false;
     }

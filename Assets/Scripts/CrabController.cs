@@ -6,6 +6,8 @@ public class CrabController : MonoBehaviour
 {
     protected AttackController attackContr;
     protected Rigidbody rb;
+    [HideInInspector]
+    public Animator animator;
 
     //SALUD
     [Header("HEALTH")]
@@ -60,6 +62,7 @@ public class CrabController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         attackContr = GetComponentInChildren<AttackController>();
         shell = GetComponentInChildren<ShellController>();
+        animator = GetComponentInChildren<Animator>();
         body = transform.GetChild(0);
 
         hittable = true;
@@ -169,14 +172,19 @@ public class CrabController : MonoBehaviour
 
     protected IEnumerator DefenceDuration(float time)
     {
-        defending = true;
-        //TODO: Aimación de defensa
+        //Aimación de defensa
+        animator.SetBool(Globals.inputDefence, true);
+        yield return new WaitForSeconds(0.15f);
 
+        //Comenzar periodo defensa
+        defending = true;
+        //DEBUG
         Material mat = GetComponentInChildren<Renderer>().material;
         Color prev = mat.color;
         mat.color = Color.blue;
-        yield return new WaitForSeconds(time);
+        yield return new WaitForSeconds(0.45f);
 
+        //Terminar periodo defensa
         mat.color = prev;
         defending = false;
     }
