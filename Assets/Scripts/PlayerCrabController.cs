@@ -36,9 +36,9 @@ public class PlayerCrabController : CrabController
         inputActions.Game.Look.performed += ctx => { lookCamera = ctx.ReadValue<Vector2>().normalized; };
         inputActions.Game.Look.performed += ctx => GetInput();
         if(attackContr!=null)
-            inputActions.Game.Attack.performed += ctx => attackContr.Attack();
-        inputActions.Game.Defence.performed += ctx => Defence();
-        inputActions.Game.DropShell.performed += ctx => DropShell();
+            inputActions.Game.Attack.started += ctx => attackContr.Attack();
+        inputActions.Game.Defence.started += ctx => Defence();
+        inputActions.Game.DropShell.started += ctx => DropShell();
 
         //Almacenamos los datos iniciales de las orbitas de la camara
         orbitsHeights = new float[cmCamera.m_Orbits.Length];
