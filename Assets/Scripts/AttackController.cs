@@ -38,7 +38,7 @@ public class AttackController : MonoBehaviour
     //Atacamos si no se está atacando
     public void Attack()
     {
-        if(!IsAttacking())
+        if(!IsAttacking() && !GameManager.gameManager.paused)
             StartCoroutine(AttackDuration(attackDuration));
     }
 
@@ -65,7 +65,9 @@ public class AttackController : MonoBehaviour
     //Devuelve si se está atacando
     public bool IsAttacking()
     {
-        return coll.enabled;
+        if(coll!=null)
+            return coll.enabled;
+        else return false;
     }
 
     //Detectamos si golpeamos a alguien

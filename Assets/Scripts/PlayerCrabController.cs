@@ -35,7 +35,8 @@ public class PlayerCrabController : CrabController
         inputActions.Game.Move.performed += ctx => { inputMove = ctx.ReadValue<Vector2>(); };
         inputActions.Game.Look.performed += ctx => { lookCamera = ctx.ReadValue<Vector2>().normalized; };
         inputActions.Game.Look.performed += ctx => GetInput();
-        inputActions.Game.Attack.performed += ctx => attackContr.Attack();
+        if(attackContr!=null)
+            inputActions.Game.Attack.performed += ctx => attackContr.Attack();
         inputActions.Game.Defence.performed += ctx => Defence();
         inputActions.Game.DropShell.performed += ctx => DropShell();
 

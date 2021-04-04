@@ -6,6 +6,11 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager gameManager;
 
+    //Menu pausa
+    public GameObject pauseMenu;
+    public bool paused = false;
+
+
     //Spawn de comida, conchas y enemigos
     [Header("SPAWNS")]
     public Collider spawnZoneColl;
@@ -39,12 +44,39 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         PrepareLevel();
+        Time.timeScale = 1;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        //Des/Pausar juego con escape
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            SwitchPause();
+        }
+    }
+
+    //Pausar/despausar
+    public void SwitchPause()
+    {
+        paused = !paused;
+
+        //Quitar pausa
+        if (!paused)
+        {
+            Time.timeScale = 1;
+            pauseMenu.SetActive(false);
+            Debug.Log("pause");
+        }
+        //Poner pausa
+        else
+        {
+            Time.timeScale = 0;
+            pauseMenu.SetActive(true);
+            Debug.Log("unpause");
+        }
+
     }
 
     //Hacer spawn de comida y enemigos dentro de la zona indicada y con cierto espacio entre elementos
