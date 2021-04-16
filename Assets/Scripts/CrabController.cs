@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class CrabController : MonoBehaviour
 {
-    protected AttackController attackContr;
+    [HideInInspector]
+    public AttackController attackContr;
     protected Rigidbody rb;
     [HideInInspector]
     public Animator animator;
@@ -45,7 +47,6 @@ public class CrabController : MonoBehaviour
     [Header("DELAYS/DURATIONS")]
     protected bool hittable = true;
     protected float hitDelay = 0.1f;
-    private float attackCurrDelay = 0;
     public float attackMinDelay = 1, attackMaxDelay = 4;
     public float defenceDuration = 0.5f;
 
@@ -55,6 +56,27 @@ public class CrabController : MonoBehaviour
     public float detectDist = 5;
     public float detectAngle = 40;
 
+    [Header("IA")]
+    //Triggers para detectar entorno en disitintos estados
+    public NavMeshAgent agent;
+    public float wanderSpeed, wanderTargetMinDist, wanderTargetMaxDist, wanderTargetAngle;
+    [Range(0,1)]
+    public float wanderWaitProbability; //Valor random que altera la probabilidad de hacer esperas en el wander del cangrejo
+    public float wanderWaitMinTime, wanderWaitMaxTime;
+    public float pursueSpeed;
+    public Transform currTarget;
+    public ShellController currTargetShell;
+    
+    //Estados que componen la maquina de estados de la IA
+    [HideInInspector]
+    public EnemyState currState;
+    [HideInInspector]
+    public EnemyStateWander wanderState;
+    [HideInInspector]
+    public EnemyStatePursue pursueState;
+    [HideInInspector]
+    public EnemyStateAttack attackState;
+
 
 
     protected virtual void Awake()
@@ -63,11 +85,18 @@ public class CrabController : MonoBehaviour
         attackContr = GetComponentInChildren<AttackController>();
         shell = GetComponentInChildren<ShellController>();
         animator = GetComponentInChildren<Animator>();
+        agent = GetComponent<NavMeshAgent>();
         body = transform.GetChild(0);
 
         hittable = true;
         initBodyScale = body.localScale;
         UpdateSpeed();
+
+        //Preparamos la máquina de estados
+        wanderState = new EnemyStateWander(this);
+        pursueState = new EnemyStatePursue(this);
+        attackState = new EnemyStateAttack(this);
+        currState = wanderState;
     }
     protected void Start()
     {
@@ -77,24 +106,24 @@ public class CrabController : MonoBehaviour
 
     private void Update()
     {
-        float dist = Vector3.Distance(PlayerCrabController.player.transform.position, transform.position);
+        //Actualizamos el estado de la maquina en el que estemos situados actualmente
+        currState.UpdateState();
 
-        //El enemigo está en el rango de vision?
-        //TODO
+        //float dist = Vector3.Distance(PlayerCrabController.player.transform.position, transform.position);
 
-        //Ataca si no se está atacando...
-        if(!attackContr.IsAttacking())
-        {
-            //...y si el jugador está lo suficientemente cerca y el ataque no esta en cooldown
-            if (dist < attackDist && attackCurrDelay <= 0)
-            {
-                attackContr.Attack();
-                //Delay random en un rango para el siguiente ataque automático
-                attackCurrDelay = Random.Range(attackMinDelay, attackMaxDelay);
-            }
-            else
-                attackCurrDelay -= Time.deltaTime;
-        }
+        ////Ataca si no se está atacando...
+        //if(!attackContr.IsAttacking())
+        //{
+        //    //...y si el jugador está lo suficientemente cerca y el ataque no esta en cooldown
+        //    if (dist < attackDist && attackCurrDelay <= 0)
+        //    {
+        //        attackContr.Attack();
+        //        //Delay random en un rango para el siguiente ataque automático
+        //        attackCurrDelay = Random.Range(attackMinDelay, attackMaxDelay);
+        //    }
+        //    else
+        //        attackCurrDelay -= Time.deltaTime;
+        //}
     }
 
 
@@ -123,6 +152,10 @@ public class CrabController : MonoBehaviour
         else if(hittable)
         {
             Debug.Log("Hit: "+attack);
+
+            if(currState != null)
+                currState.Impact();
+
             //Si tiene concha pierde los puntos de vida del ataque del enemigo
             if(shell != null)
             {

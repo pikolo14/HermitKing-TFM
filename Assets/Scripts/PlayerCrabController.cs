@@ -24,6 +24,8 @@ public class PlayerCrabController : CrabController
     {
         base.Awake();
 
+        currState = null;
+
         //Referencia estática singleton de nuestro jugador
         if (player == null)
             player = this;
