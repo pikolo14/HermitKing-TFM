@@ -10,9 +10,18 @@ public class PlayerCrabController : CrabController
     [SerializeField]
     public CrabActions inputActions;
     public CinemachineFreeLook cmCamera;
-
     public static PlayerCrabController player;
+    public Collider coll;
     public Camera cam;
+
+    //Salto desde concha
+    [Header("Jump")]
+    public float maxJumpForce;
+    public float minJumpForce;
+    public float maxJumpTime = 3;
+    public float jumpAngle = 40;
+    private bool jumpPressed = false;
+    private float jumpPressedTime = 0;
 
     //Controles de la camara
     private Vector2 inputMove = new Vector2(), lookCamera = new Vector2();
@@ -40,7 +49,8 @@ public class PlayerCrabController : CrabController
         if(attackContr!=null)
             inputActions.Game.Attack.started += ctx => attackContr.Attack();
         inputActions.Game.Defence.started += ctx => Defence();
-        inputActions.Game.DropShell.started += ctx => DropShell();
+        inputActions.Game.DropShell.started += ctx => { jumpPressed = true; };
+        inputActions.Game.DropShell.canceled += ctx => { jumpPressed = false; };
 
         //Almacenamos los datos iniciales de las orbitas de la camara
         orbitsHeights = new float[cmCamera.m_Orbits.Length];
@@ -55,6 +65,46 @@ public class PlayerCrabController : CrabController
 
     private void Update()
     {
+        if(shell != null)
+        {
+            if(jumpPressed)
+            {
+                jumpPressedTime += Time.deltaTime;
+            }
+            else if(jumpPressedTime > 0)
+            {
+                ShellJump(jumpPressedTime);
+                jumpPressedTime = 0;
+            }
+        }
+        else
+        {
+            jumpPressed = false;
+            jumpPressedTime = 0;
+        }
+    }
+
+    private void ShellJump(float time)
+    {
+        time = Mathf.Min(time, maxJumpTime) / maxJumpTime;
+
+        Vector3 force = transform.forward.normalized;
+        force.y = 0;
+        force = Quaternion.AngleAxis(jumpAngle, -transform.right) * force;
+        force.Normalize();
+        force *= Mathf.Lerp(minJumpForce, maxJumpForce, time);
+
+        StartCoroutine(TempIgnoreColl(shell.gameObject));
+        DropShell();
+        rb.AddForce(force, ForceMode.Impulse);
+    }
+
+    IEnumerator TempIgnoreColl(GameObject obj)
+    {
+        Collider objColl = obj.GetComponent<Collider>();
+        Physics.IgnoreCollision(coll, objColl, true);
+        yield return new WaitForSeconds(0.2f);
+        Physics.IgnoreCollision(coll, objColl, false);
     }
 
     protected override void FixedUpdate()
@@ -94,7 +144,6 @@ public class PlayerCrabController : CrabController
             rb.MovePosition(rb.position + moveDir * speed * speedWeightFactor * Time.fixedDeltaTime);
         }
     }
-
 
     protected override void Defeat()
     {

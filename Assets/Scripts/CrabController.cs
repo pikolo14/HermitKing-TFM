@@ -64,6 +64,7 @@ public class CrabController : MonoBehaviour
     public float wanderWaitProbability; //Valor random que altera la probabilidad de hacer esperas en el wander del cangrejo
     public float wanderWaitMinTime, wanderWaitMaxTime;
     public float pursueSpeed;
+    [SerializeField]
     public Transform currTarget;
     public ShellController currTargetShell;
     

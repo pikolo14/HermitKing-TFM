@@ -26,7 +26,7 @@ public class EnemyStateWander : EnemyState
             direction.y = enemy.transform.position.y;
             //Lejania pseudoaleatoria del siguiente punto
             direction *= Random.Range(enemy.wanderTargetMinDist, enemy.wanderTargetMaxDist);
-            enemy.agent.SetDestination(direction + enemy.agent.transform.position);
+            enemy.agent.destination = direction + enemy.agent.transform.position;
 
             //¿Hacemos una parada aleatoria al llegar a este punto?
             if(Random.Range(0f, 1f) > enemy.wanderWaitProbability)
@@ -109,7 +109,7 @@ public class EnemyStateWander : EnemyState
                     //Concha habitada por jugador
                     else if (shell == PlayerCrabController.player.shell)
                     {
-                        enemy.currTarget = coll.transform;
+                        enemy.currTarget = PlayerCrabController.player.transform;
                     }
                     //Evitamos las conchas de cangrejos enemigos
                     else

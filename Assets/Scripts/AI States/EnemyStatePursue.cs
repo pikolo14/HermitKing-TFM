@@ -15,15 +15,15 @@ public class EnemyStatePursue : EnemyState
     public void UpdateState()
     {
         //Si el jugador es el objetivo y se busca su concha y ha perdido su concha el objetivo ahora es la concha
-        if(enemy.currTarget == PlayerCrabController.player && PlayerCrabController.player.shell != enemy.currTargetShell)
+        if(enemy.currTarget == PlayerCrabController.player.transform &&
+            enemy.currTargetShell != null && PlayerCrabController.player.shell != enemy.currTargetShell)
         {
             enemy.currTarget = enemy.currTargetShell.transform;
         }
 
         //Si tiene objetivo y si se busca una concha que no es de un enemigo o se va a por el enemigo directamente (es mas grande y ha sido atacado) se dirige al objetivo
-        if (enemy.currTarget != null &&
-            (enemy.currTargetShell != null && (enemy.currTargetShell.transform.parent == null || enemy.currTargetShell.transform.parent == PlayerCrabController.player.transform))
-            ||(enemy.currTargetShell == null && enemy.currTarget == PlayerCrabController.player.transform))
+        if (enemy.currTarget != null && (enemy.currTargetShell != null && (enemy.currTargetShell.transform.parent == null || enemy.currTargetShell.transform.parent == PlayerCrabController.player.transform))
+        ||(enemy.currTargetShell == null && enemy.currTarget == PlayerCrabController.player.transform))
             enemy.agent.destination = enemy.currTarget.position;
         //En cualquier otro caso volvemos a wander
         else
