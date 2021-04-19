@@ -28,11 +28,6 @@ public class AttackController : MonoBehaviour
             controller = GetComponentInParent<CrabController>();
             enemy = true;
         }
-
-        //if (transform.parent.gameObject == PlayerCrabController.player.gameObject)
-        //    enemy = false;
-        //else
-        //    enemy = true;
     }
 
     //Atacamos si no se está atacando

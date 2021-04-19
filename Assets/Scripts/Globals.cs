@@ -14,6 +14,7 @@ public class Globals : MonoBehaviour
     public static string tagAttack = "Attack";
     public static string tagShell = "Shell";
     public static string tagFood = "Food";
+    public static string tagGround = "Ground";
 
     //INPUTS
     public static string inputAttack = "Attack";

@@ -28,6 +28,11 @@ public class ShellController : MonoBehaviour
     //Punto del cangrejo en el que se debe colocar continuamente (evitamos escalar la concha con el cangrejo)
     private Transform anchorPoint;
 
+    //Lanzamiento de la concha y daño en area
+    public SphereCollider explosionColl;
+    public float explosionDamage;
+    public float explosionRadius;
+    bool explosionReady = false;
 
 
     // Start is called before the first frame update
@@ -36,6 +41,7 @@ public class ShellController : MonoBehaviour
         coll = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
         initScale = transform.localScale;
+        explosionColl.radius = explosionRadius;
 
         //Si no esta sobre un cangrejo se inicializa su tamaño aleatoriamente (si no se asigna manualmente)
         if(anchorPoint == null)
@@ -84,7 +90,7 @@ public class ShellController : MonoBehaviour
     //Vincular concha al cangrejo poniendola en su espalda
     public bool PickUp(Transform parent, Transform point)
     {
-        if (ignoredCrab == null || ignoredCrab != parent.gameObject)
+        if (!explosionReady && ignoredCrab != parent.gameObject)
         {
             coll.enabled = false;
             rb.isKinematic = true;
@@ -101,7 +107,7 @@ public class ShellController : MonoBehaviour
     //Desvinculamos la concha de su cangrejo e ignoramos sus colisiones temporalmente
     public void Drop()
     {
-        StartCoroutine(IgnoreTemporarily(transform.parent.gameObject, ignoreCollTime));
+        StartCoroutine(IgnoreCrabTemporarily(transform.parent.gameObject, ignoreCollTime));
 
         coll.enabled = true;
         rb.isKinematic = false;
@@ -109,14 +115,40 @@ public class ShellController : MonoBehaviour
         anchorPoint = null;
     }
 
-    //Ignorar colisiones con un objeto temporalmente
-    public IEnumerator IgnoreTemporarily(GameObject ignored, float time)
+    //Lanzamos concha hacia delante para que explote
+    public void Launch(Vector3 force)
     {
-        //Collider ignoredColl = ingored.GetComponent<Collider>();
-        //Physics.IgnoreCollision(coll, ignoredColl, true);
+        //Ignoramos durante el lanzamiento el suelo
+        StartCoroutine(IgnoreColliderTemporarily(GameObject.FindGameObjectWithTag(Globals.tagGround), 0.2f));
+        //Aplicamos la fuerza a la concha para lanzarla e indicamos que va a explotar al tocar algo
+        rb.AddForce(force, ForceMode.Impulse);
+        explosionReady = true;
+    }
+
+    //Ignorar colisiones con su cangrejo temporalmente
+    public IEnumerator IgnoreCrabTemporarily(GameObject ignored, float time)
+    {
         ignoredCrab = ignored;
         yield return new WaitForSeconds(time);
         ignoredCrab = null;
-        //Physics.IgnoreCollision(coll, ingored.GetComponent<Collider>(), false);
+    }
+
+    public IEnumerator IgnoreColliderTemporarily(GameObject ignored, float time)
+    {
+        Collider ignoredColl = ignored.GetComponent<Collider>();
+        Physics.IgnoreCollision(coll, ignoredColl, true);
+        yield return new WaitForSeconds(time);
+        Physics.IgnoreCollision(coll, ignoredColl, false);
+    }
+
+    //Explotamos la concha al tocar cualquier superficie haciendo daño en area
+    public void OnCollisionEnter(Collision collision)
+    {
+        if(explosionReady && !collision.collider.CompareTag(Globals.tagPlayer))
+        {
+            GetComponentInChildren<ExplosionController>().Explode(explosionDamage, explosionRadius);
+            GetComponentInChildren<MeshRenderer>().enabled = false;
+            Destroy(gameObject, 0.1f);
+        }
     }
 }

@@ -15,7 +15,7 @@ public class PlayerCrabController : CrabController
     public Camera cam;
 
     //Salto desde concha
-    [Header("Jump")]
+    [Header("SHELL JUMP")]
     public float maxJumpForce;
     public float minJumpForce;
     public float maxJumpTime = 3;
@@ -23,9 +23,14 @@ public class PlayerCrabController : CrabController
     private bool jumpPressed = false;
     private float jumpPressedTime = 0;
 
+    //Lanzamiento concha
+    public float launchForce;
+    public float launchAngle;
+
     //Controles de la camara
-    private Vector2 inputMove = new Vector2(), lookCamera = new Vector2();
+    [Header("CAMERA")]
     public float deadZoneX = 0.2f;
+    private Vector2 inputMove = new Vector2(), lookCamera = new Vector2();
     private float[] orbitsRads, orbitsHeights;
 
 
@@ -51,6 +56,7 @@ public class PlayerCrabController : CrabController
         inputActions.Game.Defence.started += ctx => Defence();
         inputActions.Game.DropShell.started += ctx => { jumpPressed = true; };
         inputActions.Game.DropShell.canceled += ctx => { jumpPressed = false; };
+        inputActions.Game.Launch.performed += ctx => LaunchShell();
 
         //Almacenamos los datos iniciales de las orbitas de la camara
         orbitsHeights = new float[cmCamera.m_Orbits.Length];
@@ -84,28 +90,43 @@ public class PlayerCrabController : CrabController
         }
     }
 
+    //Salto cargado del jugador al dejar la concha
     private void ShellJump(float time)
     {
+        //Obtenemos la cantidad de carga del salto en función de los que se haya mantenido el botón
         time = Mathf.Min(time, maxJumpTime) / maxJumpTime;
 
+        //Obtenemos el vector de fuerza con el ángulo y rango de fuerzas indicados
         Vector3 force = transform.forward.normalized;
         force.y = 0;
         force = Quaternion.AngleAxis(jumpAngle, -transform.right) * force;
         force.Normalize();
         force *= Mathf.Lerp(minJumpForce, maxJumpForce, time);
 
+        //Ignoramos temporalmente la concha para que no interfiera, la soltamos y aplicamos la fuera al jugador
         StartCoroutine(TempIgnoreColl(shell.gameObject));
         DropShell();
         rb.AddForce(force, ForceMode.Impulse);
     }
 
-    IEnumerator TempIgnoreColl(GameObject obj)
+    //Lanzamiento hacia adelante de la concha
+    private void LaunchShell()
     {
-        Collider objColl = obj.GetComponent<Collider>();
-        Physics.IgnoreCollision(coll, objColl, true);
-        yield return new WaitForSeconds(0.2f);
-        Physics.IgnoreCollision(coll, objColl, false);
+        if(shell != null)
+        {
+            //De la misma manera que en la funcion de salto obtenemos el vector de fuerza que impulsara la concha
+            Vector3 force = transform.forward.normalized;
+            force.y = 0;
+            force = Quaternion.AngleAxis(launchAngle, -transform.right) * force;
+            force = force.normalized * launchForce;
+
+            ShellController auxShell = shell;
+            StartCoroutine(TempIgnoreColl(shell.gameObject));
+            DropShell();
+            auxShell.Launch(force);
+        }
     }
+
 
     protected override void FixedUpdate()
     {
@@ -135,13 +156,17 @@ public class PlayerCrabController : CrabController
         rb.MoveRotation(Quaternion.Euler(0f, angle, 0f));
 
         //Desplazar cangrejo en función de su rotación actual y del joystick
-        float xMove = inputMove.x;//Input.GetAxisRaw("Horizontal");
-        float zMove = inputMove.y; //Input.GetAxisRaw("Vertical");
-        Vector3 dir = new Vector3(xMove, 0, zMove).normalized;
-        if (dir.magnitude >= 0.1f)
+        //Si se está preparando para saltar de la concha no se desplaza, solo se orienta
+        if(!jumpPressed)
         {
-            Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * dir;
-            rb.MovePosition(rb.position + moveDir * speed * speedWeightFactor * Time.fixedDeltaTime);
+            float xMove = inputMove.x;
+            float zMove = inputMove.y;
+            Vector3 dir = new Vector3(xMove, 0, zMove).normalized;
+            if (dir.magnitude >= 0.1f)
+            {
+                Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * dir;
+                rb.MovePosition(rb.position + moveDir * speed * speedWeightFactor * Time.fixedDeltaTime);
+            }
         }
     }
 
@@ -187,6 +212,15 @@ public class PlayerCrabController : CrabController
         }
     }
 
+    //Ignorar temporalmente a un collider como la concha al lanzarla
+    IEnumerator TempIgnoreColl(GameObject obj)
+    {
+        Collider objColl = obj.GetComponent<Collider>();
+        Physics.IgnoreCollision(coll, objColl, true);
+        yield return new WaitForSeconds(0.2f);
+        if(coll !=null && objColl!=null)
+            Physics.IgnoreCollision(coll, objColl, false);
+    }
 
 
     //***** FIXES CINEMACHINE + NEW INPUT SYSTEM *****
