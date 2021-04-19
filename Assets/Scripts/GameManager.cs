@@ -1,14 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager gameManager;
-
-    //Menu pausa
-    public GameObject pauseMenu;
-    public bool paused = false;
 
 
     //Spawn de comida, conchas y enemigos
@@ -28,6 +25,15 @@ public class GameManager : MonoBehaviour
     public float minShellSize = 0, maxShellSize = 10;
 
 
+    [Header("IU")]
+    public GameObject victoryScreen;
+    public GameObject loseScreen;
+    public Button selectButtonWin, selectButtonLose, selectButtonPause;
+    public GameObject pauseMenu;
+    public bool paused = false;
+    public bool finished = false;
+
+
     private void Awake()
     {
         if(gameManager == null)
@@ -45,38 +51,33 @@ public class GameManager : MonoBehaviour
     {
         PrepareLevel();
         Time.timeScale = 1;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        //Des/Pausar juego con escape
-        if(Input.GetKeyDown(KeyCode.Escape))
-        {
-            SwitchPause();
-        }
+        finished = false;
     }
 
     //Pausar/despausar
-    public void SwitchPause()
+    public void SwitchPause(bool showMenu = true)
     {
-        paused = !paused;
-
-        //Quitar pausa
-        if (!paused)
+        if(!finished)
         {
-            Time.timeScale = 1;
-            pauseMenu.SetActive(false);
-            Debug.Log("pause");
-        }
-        //Poner pausa
-        else
-        {
-            Time.timeScale = 0;
-            pauseMenu.SetActive(true);
-            Debug.Log("unpause");
-        }
+            paused = !paused;
 
+            //Quitar pausa
+            if (!paused)
+            {
+                Time.timeScale = 1;
+                pauseMenu.SetActive(false);
+            }
+            //Poner pausa
+            else
+            {
+                Time.timeScale = 0;
+                if(showMenu)
+                {
+                    selectButtonPause.Select();
+                    pauseMenu.SetActive(true);
+                }
+            }
+        }
     }
 
     //Hacer spawn de comida y enemigos dentro de la zona indicada y con cierto espacio entre elementos
@@ -148,5 +149,23 @@ public class GameManager : MonoBehaviour
         {
             points2D.RemoveAt(index);
         }
+    }
+
+    //Mostrar pantalla de derrota pausando el tiempo
+    public void Lose()
+    {
+        SwitchPause(false);
+        finished = true;
+        loseScreen.SetActive(true);
+        selectButtonLose.Select();
+    }
+
+    //Mostrar pantalla de victoria pausando el tiempo
+    public void Win()
+    {
+        SwitchPause(false);
+        finished = true;
+        victoryScreen.SetActive(true);
+        selectButtonWin.Select();
     }
 }

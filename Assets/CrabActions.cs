@@ -65,6 +65,14 @@ public class @CrabActions : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""508790bb-4166-4c78-b0d0-11606e86bd01"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -243,6 +251,28 @@ public class @CrabActions : IInputActionCollection, IDisposable
                     ""action"": ""Launch"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dc34c20f-7baf-42b3-911e-885d77bb485f"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8c45e230-511f-4a64-9e04-384ca6988988"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -285,6 +315,7 @@ public class @CrabActions : IInputActionCollection, IDisposable
         m_Game_Defence = m_Game.FindAction("Defence", throwIfNotFound: true);
         m_Game_DropShell = m_Game.FindAction("DropShell", throwIfNotFound: true);
         m_Game_Launch = m_Game.FindAction("Launch", throwIfNotFound: true);
+        m_Game_Pause = m_Game.FindAction("Pause", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -340,6 +371,7 @@ public class @CrabActions : IInputActionCollection, IDisposable
     private readonly InputAction m_Game_Defence;
     private readonly InputAction m_Game_DropShell;
     private readonly InputAction m_Game_Launch;
+    private readonly InputAction m_Game_Pause;
     public struct GameActions
     {
         private @CrabActions m_Wrapper;
@@ -350,6 +382,7 @@ public class @CrabActions : IInputActionCollection, IDisposable
         public InputAction @Defence => m_Wrapper.m_Game_Defence;
         public InputAction @DropShell => m_Wrapper.m_Game_DropShell;
         public InputAction @Launch => m_Wrapper.m_Game_Launch;
+        public InputAction @Pause => m_Wrapper.m_Game_Pause;
         public InputActionMap Get() { return m_Wrapper.m_Game; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -377,6 +410,9 @@ public class @CrabActions : IInputActionCollection, IDisposable
                 @Launch.started -= m_Wrapper.m_GameActionsCallbackInterface.OnLaunch;
                 @Launch.performed -= m_Wrapper.m_GameActionsCallbackInterface.OnLaunch;
                 @Launch.canceled -= m_Wrapper.m_GameActionsCallbackInterface.OnLaunch;
+                @Pause.started -= m_Wrapper.m_GameActionsCallbackInterface.OnPause;
+                @Pause.performed -= m_Wrapper.m_GameActionsCallbackInterface.OnPause;
+                @Pause.canceled -= m_Wrapper.m_GameActionsCallbackInterface.OnPause;
             }
             m_Wrapper.m_GameActionsCallbackInterface = instance;
             if (instance != null)
@@ -399,6 +435,9 @@ public class @CrabActions : IInputActionCollection, IDisposable
                 @Launch.started += instance.OnLaunch;
                 @Launch.performed += instance.OnLaunch;
                 @Launch.canceled += instance.OnLaunch;
+                @Pause.started += instance.OnPause;
+                @Pause.performed += instance.OnPause;
+                @Pause.canceled += instance.OnPause;
             }
         }
     }
@@ -429,5 +468,6 @@ public class @CrabActions : IInputActionCollection, IDisposable
         void OnDefence(InputAction.CallbackContext context);
         void OnDropShell(InputAction.CallbackContext context);
         void OnLaunch(InputAction.CallbackContext context);
+        void OnPause(InputAction.CallbackContext context);
     }
 }

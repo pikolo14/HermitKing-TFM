@@ -57,6 +57,7 @@ public class PlayerCrabController : CrabController
         inputActions.Game.DropShell.started += ctx => { jumpPressed = true; };
         inputActions.Game.DropShell.canceled += ctx => { jumpPressed = false; };
         inputActions.Game.Launch.performed += ctx => LaunchShell();
+        inputActions.Game.Pause.started += ctx => GameManager.gameManager.SwitchPause();
 
         //Almacenamos los datos iniciales de las orbitas de la camara
         orbitsHeights = new float[cmCamera.m_Orbits.Length];
@@ -67,6 +68,12 @@ public class PlayerCrabController : CrabController
             orbitsHeights[i] = cmCamera.m_Orbits[i].m_Height;
             orbitsRads[i] = cmCamera.m_Orbits[i].m_Radius;
         }
+    }
+
+    //Desactivamos las vinculaciones de eventos para evitar errores de llamadas a eventos que ya no existen
+    private void OnDestroy()
+    {
+        inputActions.Game.Disable();
     }
 
     private void Update()
@@ -172,8 +179,8 @@ public class PlayerCrabController : CrabController
 
     protected override void Defeat()
     {
-        Debug.Log("Ermitaño principal muerto");
         //TODO
+        GameManager.gameManager.Lose();
     }
 
     //Aumentamos el tamaño al comer
