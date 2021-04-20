@@ -166,7 +166,11 @@ public class CrabController : MonoBehaviour
                 {
                     DropShell();
                 }
-                //TODO: Efecto visual en la concha
+                else
+                {
+                    //Aumentar grietas visibles en la concha
+                    shell.SetCrackedMaterial(1-(health/(float)shell.health));
+                }
 
                 StartCoroutine(HitDelay());
             }

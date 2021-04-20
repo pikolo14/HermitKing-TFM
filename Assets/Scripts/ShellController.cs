@@ -34,6 +34,8 @@ public class ShellController : MonoBehaviour
     public float explosionRadius;
     bool explosionReady = false;
 
+    public Renderer renderer;
+
 
     // Start is called before the first frame update
     void Start()
@@ -50,6 +52,10 @@ public class ShellController : MonoBehaviour
             float ranSize = Random.Range(GameManager.gameManager.minShellSize, GameManager.gameManager.maxShellSize);
             SetSize(ranSize);
         }
+
+        //Preparamos material de la concha
+        renderer = GetComponentInChildren<Renderer>();
+        SetCrackedMaterial(0);
     }
 
     // Update is called once per frame
@@ -113,6 +119,9 @@ public class ShellController : MonoBehaviour
         rb.isKinematic = false;
         transform.parent = null;
         anchorPoint = null;
+
+        //Restablecemos la apariencia de la concha
+        SetCrackedMaterial(0);
     }
 
     //Lanzamos concha hacia delante para que explote
@@ -150,5 +159,13 @@ public class ShellController : MonoBehaviour
             GetComponentInChildren<MeshRenderer>().enabled = false;
             Destroy(gameObject, 0.1f);
         }
+    }
+
+    //Modificar la apariencia de la concha en funcion de la vida que quede
+    public void SetCrackedMaterial(float cracked)
+    {
+        Material material = new Material(renderer.material);
+        material.SetFloat("CrackedQuantity", cracked);
+        renderer.material = material;
     }
 }
