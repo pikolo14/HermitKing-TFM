@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
     public bool paused = false;
     public bool finished = false;
 
+    [Header("DEBUG")]
+    public bool enabledGeneration = true;
 
     private void Awake()
     {
@@ -49,7 +51,8 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void OnEnable()
     {
-        PrepareLevel();
+        if(enabledGeneration)
+            PrepareLevel();
         Time.timeScale = 1;
         finished = false;
     }

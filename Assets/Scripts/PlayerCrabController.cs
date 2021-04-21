@@ -33,6 +33,10 @@ public class PlayerCrabController : CrabController
     private Vector2 inputMove = new Vector2(), lookCamera = new Vector2();
     private float[] orbitsRads, orbitsHeights;
 
+    //Evento para comunicar a las conchas que se ha aumentado de tamaño
+    public delegate void SizeEvent(float size);
+    public static event SizeEvent SizeCallback;
+
 
     protected override void Awake()
     {
@@ -70,10 +74,15 @@ public class PlayerCrabController : CrabController
         }
     }
 
-    //Desactivamos las vinculaciones de eventos para evitar errores de llamadas a eventos que ya no existen
     private void OnDestroy()
     {
+        //Desactivamos las vinculaciones de eventos para evitar errores de llamadas a eventos que ya no existen
         inputActions.Game.Disable();
+
+        //Desubscribir todos los eventos del callback de cambio de tamaño
+        if (SizeCallback != null)
+            foreach (var d in SizeCallback.GetInvocationList())
+                SizeCallback  -= (d as SizeEvent);
     }
 
     private void Update()
@@ -95,6 +104,8 @@ public class PlayerCrabController : CrabController
             jumpPressed = false;
             jumpPressedTime = 0;
         }
+
+        MoveLegs();
     }
 
     //Salto cargado del jugador al dejar la concha
@@ -137,7 +148,7 @@ public class PlayerCrabController : CrabController
 
     protected override void FixedUpdate()
     {
-        base.FixedUpdate();
+        Move();
     }
 
     public void OnCollisionEnter(Collision collision)
@@ -155,7 +166,7 @@ public class PlayerCrabController : CrabController
         }
     }
 
-    protected override void Move()
+    private void Move()
     {
         //Rotar cangrejo para encajar en la dirección de la cámara en cierto tiempo
         float targetAngle = cam.transform.eulerAngles.y;
@@ -203,6 +214,9 @@ public class PlayerCrabController : CrabController
     {
         body.localScale = initBodyScale * size * GameManager.gameManager.scaleFactor;
         //TODO: ¿Actualizar posición del caparazón teniendo en cuenta tamaño de cangrejo y de caparazon?
+
+        //Comunicar a todas las conchas subscritas que se ha aumentado el tamaño para cambiar su visualizacion
+        SizeCallback(size);
 
         //Alejar camara conforme crezca con la propoción del tamaño actual respecto al inicial para aplicarlo a los orbits
         float prop = body.localScale.x / initBodyScale.x;

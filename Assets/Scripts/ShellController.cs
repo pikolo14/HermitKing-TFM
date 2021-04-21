@@ -8,7 +8,7 @@ public class ShellController : MonoBehaviour
     public Collider coll;
     [HideInInspector]
     public Rigidbody rb;
-
+    private Renderer rend;
 
     //Stats
     public int health;
@@ -34,8 +34,13 @@ public class ShellController : MonoBehaviour
     public float explosionRadius;
     bool explosionReady = false;
 
-    public Renderer renderer;
 
+
+    private void Awake()
+    {
+        //Suscribirse al evento de cambio de tamaño del jugador para cambiar la apariencia de la concha
+        PlayerCrabController.SizeCallback += ctx => CheckAvailability(ctx);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -54,7 +59,7 @@ public class ShellController : MonoBehaviour
         }
 
         //Preparamos material de la concha
-        renderer = GetComponentInChildren<Renderer>();
+        rend = GetComponentInChildren<Renderer>();
         SetCrackedMaterial(0);
     }
 
@@ -164,8 +169,59 @@ public class ShellController : MonoBehaviour
     //Modificar la apariencia de la concha en funcion de la vida que quede
     public void SetCrackedMaterial(float cracked)
     {
-        Material material = new Material(renderer.material);
+        Material material = new Material(rend.material);
         material.SetFloat("CrackedQuantity", cracked);
-        renderer.material = material;
+        rend.material = material;
+    }
+
+    public void CheckAvailability(float size)
+    {
+        float disconfort = GetDisconfort(size);
+        //Si el jugador todavia no tiene el tamaño para entrar
+        if (disconfort < 0)
+        {
+            SetAvailability(0);
+        }
+        //Si el jugador puede ocupar ahora la concha la encendemos para que se vea
+        else if(disconfort == 0)
+        {
+            SetAvailability(1);
+        }
+        //Si el jugador ya no podrá ocupar esta concha la desactivamos
+        else
+        {
+            SetAvailability(2);
+        }
+    }
+
+    public void SetAvailability (int availability)
+    {
+        if(rend!= null)
+        {
+            Material material = new Material(rend.material);
+        
+            switch (availability)
+            {
+                //Normal: Demasiado pequeño para ocupar la concha
+                case 0:
+                    material.SetInt("Available", 0);
+                    material.SetInt("Disabled", 0);
+                    break;
+                //Disponible: Tamaño perfecto para ocuparla
+                case 1:
+                    material.SetInt("Available", 1);
+                    material.SetInt("Disabled", 0);
+                    break;
+                //Bloqueada: Demasiado grande para ocuparla
+                case 2:
+                    material.SetInt("Available", 0);
+                    material.SetInt("Disabled", 1);
+                    //Ya no es necesario estar subscrito al evento, no va a volver a ser habitable nunca
+                    PlayerCrabController.SizeCallback -= ctx => CheckAvailability(ctx);
+                    break;
+            }
+
+            rend.material = material;
+        }
     }
 }

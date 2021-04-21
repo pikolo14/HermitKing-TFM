@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Animations.Rigging;
 
 public class CrabController : MonoBehaviour
 {
@@ -78,6 +79,15 @@ public class CrabController : MonoBehaviour
     [HideInInspector]
     public EnemyStateAttack attackState;
 
+    [Header("PROCEDURAL ANIMATION")]
+    public Transform tipsEffectorsPrefab;
+    protected Transform tipsEffectors; //Puntos reales en el mundo en los que se sitúan las puntas de las patas (si están lo suficientemente cerca como para llegar)
+    public Transform[] projectPointsTips; //Puntos emparentados con el cangrejo donde idealmente deberían estar situadas las puntas de las patas
+    protected Coroutine[] tipMovementCorr;
+    protected TwoBoneIKConstraint[] legConstraints;
+    public RigBuilder rigBuilder;
+    public float legMaxDist = 0.4f;
+    public float effectorMoveTime = 0.2f;
 
 
     protected virtual void Awake()
@@ -88,6 +98,20 @@ public class CrabController : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         agent = GetComponent<NavMeshAgent>();
         body = transform.GetChild(0);
+
+        //Preparacion effectors animacion
+        tipsEffectors = Instantiate(tipsEffectorsPrefab);
+        tipsEffectors.position = transform.position;
+        tipsEffectors.rotation = transform.rotation;
+
+        legConstraints = GetComponentsInChildren<TwoBoneIKConstraint>();
+        for (int i = 0; i < legConstraints.Length; i++)
+        {
+            legConstraints[i].data.target = tipsEffectors.GetChild(i);
+        }
+        //La asignacion de targets debe hacerse antes de activar el rigBuilder
+        rigBuilder.enabled = true;
+
 
         hittable = true;
         initBodyScale = body.localScale;
@@ -103,43 +127,66 @@ public class CrabController : MonoBehaviour
     {
         //Inicializamos el tamaño para que inicialmente  al multiplicar por el factor se obtenga la escala original
         size = 1 / GameManager.gameManager.scaleFactor;
+
+        tipMovementCorr = new Coroutine[projectPointsTips.Length];
     }
 
     private void Update()
     {
         //Actualizamos el estado de la maquina en el que estemos situados actualmente
         currState.UpdateState();
+        MoveLegs();
+    }
 
-        //float dist = Vector3.Distance(PlayerCrabController.player.transform.position, transform.position);
+    protected void MoveLegs()
+    {
+        for (int i = 0; i<projectPointsTips.Length; i++)
+        {
+            Transform tip = tipsEffectors.GetChild(i);
+            //Proyectar posición ideal de la patas sobre la capa del suelo exclusivamente
+            Ray ray = new Ray(new Vector3(projectPointsTips[i].position.x, 100, projectPointsTips[i].position.z), Vector3.down);
+            RaycastHit hit;
 
-        ////Ataca si no se está atacando...
-        //if(!attackContr.IsAttacking())
-        //{
-        //    //...y si el jugador está lo suficientemente cerca y el ataque no esta en cooldown
-        //    if (dist < attackDist && attackCurrDelay <= 0)
-        //    {
-        //        attackContr.Attack();
-        //        //Delay random en un rango para el siguiente ataque automático
-        //        attackCurrDelay = Random.Range(attackMinDelay, attackMaxDelay);
-        //    }
-        //    else
-        //        attackCurrDelay -= Time.deltaTime;
-        //}
+            int layerMask = (1 << LayerMask.NameToLayer("Ground"));
+            Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask);
+            Debug.DrawLine(hit.point, hit.point + Vector3.up * 0.2f, Color.magenta);
+
+            //Comprobamos si se supera el umbral de distancia desde la posicion actual de la punta hasta el punto proyectado
+            float dist = Vector3.Distance(hit.point, tip.position);
+            if (dist > legMaxDist)
+            {
+                //Lanzamos la corrutina de desplazar la pata progresivamente, si hay una corrutina en marcha se para antes para evitar solapes
+                if(tipMovementCorr[i]!=null)
+                {
+                    StopCoroutine(tipMovementCorr[i]);
+                    tipMovementCorr[i] = null;
+                }
+                tipMovementCorr[i] = StartCoroutine(EffectorDisplacement(tip, hit.point, effectorMoveTime, i));
+                tip.position = hit.point;
+            }
+        }
+    }
+
+    //Funcion para desplazar progresivamente un effector de la animacion como la punta de la pata
+    protected IEnumerator EffectorDisplacement(Transform effector, Vector3 target, float time, int id)
+    {
+        float currTime = 0;
+        float multTime = 1 / time;//Multiplicar tiempo para que esté entre 0 y 1 al introducirlo en el lerp
+        Vector3 origin = effector.position;
+
+        while(currTime < 1)
+        {
+            currTime += Time.deltaTime * multTime;
+            effector.position = Vector3.Lerp(origin, target, currTime);
+            //yield return null;
+            yield return new WaitForEndOfFrame();
+        }
     }
 
 
     // Update is called once per frame
-    protected virtual void FixedUpdate()
-    {
-        Move();
-    }
+    protected virtual void FixedUpdate() { }
     
-    //Mover el cangrejo mediante IA
-    protected virtual void Move()
-    {
-        //TODO: Comportamiento movimiento cangrejos IA
-    }
-
     
     //Recibir un golpe y perder vida
     public void GetHit(int attack)
