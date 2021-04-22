@@ -11,7 +11,6 @@ public class PlayerCrabController : CrabController
     public CrabActions inputActions;
     public CinemachineFreeLook cmCamera;
     public static PlayerCrabController player;
-    public Collider coll;
     public Camera cam;
 
     //Salto desde concha
@@ -124,6 +123,7 @@ public class PlayerCrabController : CrabController
         //Ignoramos temporalmente la concha para que no interfiera, la soltamos y aplicamos la fuera al jugador
         StartCoroutine(TempIgnoreColl(shell.gameObject));
         DropShell();
+        rb.isKinematic = false;
         rb.AddForce(force, ForceMode.Impulse);
     }
 
@@ -237,10 +237,13 @@ public class PlayerCrabController : CrabController
     IEnumerator TempIgnoreColl(GameObject obj)
     {
         Collider objColl = obj.GetComponent<Collider>();
-        Physics.IgnoreCollision(coll, objColl, true);
+        Physics.IgnoreCollision(bodyColl, objColl, true);
+        Physics.IgnoreCollision(groundColl, objColl, true);
         yield return new WaitForSeconds(0.2f);
-        if(coll !=null && objColl!=null)
-            Physics.IgnoreCollision(coll, objColl, false);
+        if(bodyColl !=null && objColl!=null)
+            Physics.IgnoreCollision(bodyColl, objColl, false);
+        if (groundColl != null && objColl != null)
+            Physics.IgnoreCollision(groundColl, objColl, false);
     }
 
 

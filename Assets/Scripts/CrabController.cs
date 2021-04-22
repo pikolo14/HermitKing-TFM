@@ -8,9 +8,11 @@ public class CrabController : MonoBehaviour
 {
     [HideInInspector]
     public AttackController attackContr;
-    protected Rigidbody rb;
+    public Rigidbody rb;
     [HideInInspector]
     public Animator animator;
+    public CapsuleCollider bodyColl;
+    public BoxCollider groundColl;
 
     //SALUD
     [Header("HEALTH")]
@@ -88,6 +90,7 @@ public class CrabController : MonoBehaviour
     public RigBuilder rigBuilder;
     public float legMaxDist = 0.4f;
     public float effectorMoveTime = 0.2f;
+    public float bodyHeight = 0.5f;
 
 
     protected virtual void Awake()
@@ -140,6 +143,8 @@ public class CrabController : MonoBehaviour
 
     protected void MoveLegs()
     {
+        float averageHeight = 0;
+
         for (int i = 0; i<projectPointsTips.Length; i++)
         {
             Transform tip = tipsEffectors.GetChild(i);
@@ -149,7 +154,7 @@ public class CrabController : MonoBehaviour
 
             int layerMask = (1 << LayerMask.NameToLayer("Ground"));
             Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask);
-            Debug.DrawLine(hit.point, hit.point + Vector3.up * 0.2f, Color.magenta);
+            //Debug.DrawLine(hit.point, hit.point + Vector3.up * 0.2f, Color.magenta);
 
             //Comprobamos si se supera el umbral de distancia desde la posicion actual de la punta hasta el punto proyectado
             float dist = Vector3.Distance(hit.point, tip.position);
@@ -162,9 +167,41 @@ public class CrabController : MonoBehaviour
                     tipMovementCorr[i] = null;
                 }
                 tipMovementCorr[i] = StartCoroutine(EffectorDisplacement(tip, hit.point, effectorMoveTime, i));
-                tip.position = hit.point;
             }
+
+            averageHeight += tip.position.y;
         }
+        averageHeight /= projectPointsTips.Length;
+
+        //Nivelar altura del ground collider para elevar del suelo en funcion de la posición de las patas
+        Ray rayAux = new Ray(groundColl.transform.position, Vector3.down);
+        RaycastHit hitAux;
+        Physics.Raycast(rayAux, out hitAux, Mathf.Infinity, (1 << LayerMask.NameToLayer("Ground")));
+        groundColl.size = new Vector3(groundColl.size.x, Mathf.Clamp((bodyHeight + (averageHeight-hitAux.point.y)),0,bodyHeight*2f)*2f / groundColl.transform.localScale.y, groundColl.size.z);
+
+        ////Rotar cuerpo en funcion de la posición de las patas
+        ////Punto medio patas delanteras
+        //Vector3 aux1 = (tipsEffectors.GetChild(0).position - tipsEffectors.GetChild(2).position)/2f + tipsEffectors.GetChild(2).position;
+        ////Punto medio patas traseras
+        //Vector3 aux2 = (tipsEffectors.GetChild(1).position - tipsEffectors.GetChild(3).position) / 2f + tipsEffectors.GetChild(3).position;
+        //Vector3 dirX = aux1 - aux2;
+        //float angleX = Mathf.Abs(Vector3.SignedAngle(dirX, transform.forward, transform.right));
+
+        ////Punto medio patas derechas
+        //Vector3 aux3 = (tipsEffectors.GetChild(0).position - tipsEffectors.GetChild(1).position) / 2f + tipsEffectors.GetChild(1).position;
+        ////Punto medio patas izquierdas
+        //Vector3 aux4 = (tipsEffectors.GetChild(2).position - tipsEffectors.GetChild(3).position) / 2f + tipsEffectors.GetChild(3).position;
+        //Vector3 dirZ = aux3 - aux4;
+        //float angleZ = Mathf.Abs(Vector3.SignedAngle(dirZ, transform.right, transform.forward));
+
+        //float ang = 0;
+        //Vector3 axis = transform.up;
+        //rb.rotation.ToAngleAxis(out ang, out axis);
+        //rb.rotation = Quaternion.AngleAxis(angleX, transform.right) * Quaternion.AngleAxis(angleZ, transform.forward) * Quaternion.AngleAxis(ang, axis);
+
+
+        //if(grounded)
+        //    rb.position = new Vector3(rb.position.x, height + averageHeight, rb.position.z);
     }
 
     //Funcion para desplazar progresivamente un effector de la animacion como la punta de la pata
@@ -173,6 +210,7 @@ public class CrabController : MonoBehaviour
         float currTime = 0;
         float multTime = 1 / time;//Multiplicar tiempo para que esté entre 0 y 1 al introducirlo en el lerp
         Vector3 origin = effector.position;
+        //yield return null;
 
         while(currTime < 1)
         {

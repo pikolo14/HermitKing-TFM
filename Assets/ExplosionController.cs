@@ -22,6 +22,5 @@ public class ExplosionController : MonoBehaviour
         coll.enabled = true;
         coll.radius = _radius;
         //TODO: Instanciar explosion
-        Debug.Log("BUUUM YA ESTA AQUI LA GUERRA");
     }
 }

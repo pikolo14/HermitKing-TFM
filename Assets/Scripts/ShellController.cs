@@ -35,11 +35,11 @@ public class ShellController : MonoBehaviour
     bool explosionReady = false;
 
 
-
     private void Awake()
     {
         //Suscribirse al evento de cambio de tamaño del jugador para cambiar la apariencia de la concha
         PlayerCrabController.SizeCallback += ctx => CheckAvailability(ctx);
+        CheckAvailability(PlayerCrabController.player.size);
     }
 
     // Start is called before the first frame update
