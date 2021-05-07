@@ -129,7 +129,7 @@ public class Globals : MonoBehaviour
         RaycastHit hit;
         Vector3 origin = new Vector3(point2D.x, 100, point2D.y) + bounds.center;
         Ray ray = new Ray(origin, Vector3.down);
-        //Ingoramos los triggers detectores de los enemigos
+        //Ignoramos los triggers detectores de los enemigos
         int layerMask = ~(1 >> LayerMask.NameToLayer("IATriggers"));
 
         if (Physics.Raycast(ray, out hit,Mathf.Infinity, layerMask) && hit.collider.gameObject.CompareTag(tagGround))

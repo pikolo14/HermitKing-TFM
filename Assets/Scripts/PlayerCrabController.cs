@@ -37,7 +37,9 @@ public class PlayerCrabController : CrabController
     public delegate void SizeEvent(float size);
     public static event SizeEvent SizeCallback;
 
-    public int foodCount = 0; 
+    public int foodCount = 0;
+
+    public float jumpingTime = 0;
 
 
     protected override void Awake()
@@ -126,7 +128,7 @@ public class PlayerCrabController : CrabController
         //Ignoramos temporalmente la concha para que no interfiera, la soltamos y aplicamos la fuerza al jugador
         StartCoroutine(TempIgnoreColl(shell.gameObject));
         DropShell();
-        rb.isKinematic = false;
+        jumpingTime = 0.5f;
         rb.AddForce(force, ForceMode.Impulse);
     }
 
@@ -151,17 +153,15 @@ public class PlayerCrabController : CrabController
 
     protected override void FixedUpdate()
     {
+        if(jumpingTime > 0)
+        {
+            jumpingTime -= Time.fixedDeltaTime;
+        }
         Move();
     }
 
     public void OnCollisionEnter(Collision collision)
     {
-        ////Comer
-        //if(collision.collider.CompareTag(Globals.tagFood))
-        //{
-        //    Eat(GameManager.gameManager.foodSizeIncr);
-        //    Destroy(collision.collider.gameObject);
-        //}
         //Coger concha si no tenemos una ya equipada
         if(collision.collider.CompareTag(Globals.tagShell) && shell==null)
         {
@@ -188,6 +188,21 @@ public class PlayerCrabController : CrabController
                 Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * dir;
                 rb.MovePosition(rb.position + moveDir * baseSpeed * size * speedWeightFactor * Time.fixedDeltaTime);
             }
+        }
+
+        //Si esta grounded y no se está en mitad de un salto
+        RaycastHit hit;
+        Ray ray = new Ray(transform.position, Vector3.down);
+        int layer = 1 << 9;
+
+        if (jumpingTime <= 0 && Physics.Raycast(ray, out hit, bodyHeight * size * 2f, layer))
+        {
+            //Evitar que el cangrejo se mueva solo cuando no se tocan los controles, como en una pendiente
+            rb.velocity = new Vector3(0,rb.velocity.y, 0);
+        }
+        else
+        {
+            Debug.DrawRay(transform.position, Vector3.down, Color.red);
         }
     }
 
