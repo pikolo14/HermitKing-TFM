@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyStateWander : EnemyState
 {
@@ -25,11 +26,17 @@ public class EnemyStateWander : EnemyState
             //Nos aseguramos de que sea paralelo al suelo
             direction.y = enemy.transform.position.y;
             //Lejania pseudoaleatoria del siguiente punto
-            direction *= Random.Range(enemy.wanderTargetMinDist, enemy.wanderTargetMaxDist);
-            enemy.agent.destination = direction + enemy.agent.transform.position;
+            direction *= Random.Range(enemy.wanderTargetMinDist*enemy.size, enemy.wanderTargetMaxDist*enemy.size);
+            direction.y = 0;
+            Vector3 point = direction + enemy.agent.transform.position;
+            point.y = 0;
+            enemy.agent.destination = point;
+
+            //Cambiamos la velocidad a más lento para caminar
+            enemy.agent.speed = enemy.slowSpeedMult * enemy.baseSpeed * enemy.size;
 
             //¿Hacemos una parada aleatoria al llegar a este punto?
-            if(Random.Range(0f, 1f) > enemy.wanderWaitProbability)
+            if (Random.Range(0f, 1f) > enemy.wanderWaitProbability)
             {
                 //Parada de tiempo aleatorio
                 remainingWait = Random.Range(enemy.wanderWaitMinTime, enemy.wanderWaitMaxTime);
@@ -83,7 +90,7 @@ public class EnemyStateWander : EnemyState
                 ShellController shell = null;
 
                 //Obtenemos la concha en cuestion, deshabitada o la del jugador
-                if (coll.gameObject.CompareTag(Globals.tagShell))
+                if (coll.gameObject.CompareTag(Globals.tagShell) && coll.gameObject.name != Globals.finalShell)
                 {
                     //TODO: Optimizar para no tener que usar en cada iteración
                     shell = coll.GetComponent<ShellController>();

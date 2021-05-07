@@ -4,18 +4,20 @@ using UnityEngine;
 
 public class AttackController : MonoBehaviour
 {
-    private Collider coll;
+    public Collider [] colls;
     private CrabController controller;
     private bool enemy = false;
-
-    public int attackDamage = 1;
     public float attackDuration = 0.5f;
 
 
     void Start()
     {
-        coll = GetComponent<Collider>();
-        coll.enabled = false;
+        //Nos suscribimos al evento de golpear a un cangrejo contrincante en los dos detectores
+        foreach(Collider c in colls)
+        {
+            c.enabled = false;
+            c.gameObject.GetComponent<AttackDetector>().HitCallback += HitCrab;
+        }
 
         //Asignamos el componente controlador del cangrejo en funcion de si está asignado al cangrejo principal o a enemigos
         controller = GetComponentInParent<PlayerCrabController>();
@@ -42,43 +44,44 @@ public class AttackController : MonoBehaviour
     {
         //Animacion de ataque
         controller.animator.SetBool(Globals.inputAttack, true);
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.5f);
 
         //Activamos el collider de ataque
-        coll.enabled = true;
+        foreach (Collider c in colls)
+            c.enabled = true;
         //DEBUG
         Material mat = transform.parent.GetComponentInChildren<Renderer>().material;
         Color prev = mat.color;
         mat.color = Color.red;
 
         //Desactivamos el collider
-        yield return new WaitForSeconds(0.35f);
+        yield return new WaitForSeconds(attackDuration);
         mat.color = prev;
-        coll.enabled = false;
+        foreach (Collider c in colls)
+            c.enabled = false;
     }
 
     //Devuelve si se está atacando
     public bool IsAttacking()
     {
-        if(coll!=null)
-            return coll.enabled;
+        if(colls[0]!=null)
+            return colls[0].enabled;
         else return false;
     }
 
-    //Detectamos si golpeamos a alguien
-    private void OnTriggerEnter(Collider other)
+    //Comunicar el golpe al cangrejo contrincante en función de la diferencia de tamaños
+    public void HitCrab(GameObject crab)
     {
-        //Si estamos en un enemigo y entramos en el cuerpo del jugador, dañamos al jugador
-        if (enemy && other.CompareTag(Globals.tagPlayer))
-        {
-            PlayerCrabController player = other.GetComponentInParent<PlayerCrabController>();
-            player.GetHit(attackDamage);
-        }
-        //Si estamos en el cangrejo del jugador y entramos en el cuerpo de un enemigo, lo dañamos
-        else if (!enemy && other.CompareTag(Globals.tagEnemy))
-        {
-            CrabController enemy = other.GetComponentInParent<CrabController>();
-            enemy.GetHit(attackDamage);
-        }
+        CrabController advContr;
+
+        if (enemy)
+            advContr = crab.GetComponentInParent<PlayerCrabController>();
+        else
+            advContr = crab.GetComponentInParent<CrabController>();
+
+        //El aumento de daño se incrementa en enteros en funcion del valor que hemos puesto de margen. El mínimo siempre será 1
+        int damage = Mathf.Max((int)(Mathf.Floor((controller.size - advContr.size)/GameManager.gameManager.sizeDiffAttackStep) +1), 1);
+
+        advContr.GetHit(damage);
     }
 }

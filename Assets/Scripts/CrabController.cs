@@ -20,7 +20,7 @@ public class CrabController : MonoBehaviour
 
     //TAMAÑO
     [Header("SIZE")]
-    public float size;
+    public float size = 0;
     protected Vector3 initBodyScale;
     protected Transform body;
     
@@ -29,12 +29,12 @@ public class CrabController : MonoBehaviour
     public Transform shellPoint;
     [HideInInspector]
     public ShellController shell;
-    public static float disconfortFactor = 0.5f;
+    public static float disconfortFactor = 6f;
     protected float discomfort = 0;
 
     //MOVIMIENTO y HABILIDADES
     [Header("MOVEMENT AND SKILLS")]
-    public float speed = 5f;
+    public float baseSpeed = 5f;
     public float turnSmoothTime = 0.2f;
     protected float turnSmoothVel;
     protected bool defending = false;
@@ -60,13 +60,12 @@ public class CrabController : MonoBehaviour
     public float detectAngle = 40;
 
     [Header("IA")]
-    //Triggers para detectar entorno en disitintos estados
-    public NavMeshAgent agent;
-    public float wanderSpeed, wanderTargetMinDist, wanderTargetMaxDist, wanderTargetAngle;
+    public NavMeshAgent agent = null;
+    public float slowSpeedMult, wanderTargetMinDist, wanderTargetMaxDist, wanderTargetAngle;
     [Range(0,1)]
     public float wanderWaitProbability; //Valor random que altera la probabilidad de hacer esperas en el wander del cangrejo
     public float wanderWaitMinTime, wanderWaitMaxTime;
-    public float pursueSpeed;
+    
     [SerializeField]
     public Transform currTarget;
     public ShellController currTargetShell;
@@ -128,10 +127,30 @@ public class CrabController : MonoBehaviour
     }
     protected void Start()
     {
-        //Inicializamos el tamaño para que inicialmente  al multiplicar por el factor se obtenga la escala original
-        size = 1 / GameManager.gameManager.scaleFactor;
+        //Inicializamos el tamaño para que inicialmente al multiplicar por el factor se obtenga la escala original
+        if(size == 0)
+            size = 1 / GameManager.gameManager.scaleFactor;
 
         tipMovementCorr = new Coroutine[projectPointsTips.Length];
+
+        UpdateCrabSize();
+    }
+
+    private void OnEnable()
+    {
+        //Generar con concha en ocasiones
+        if(Random.Range(0f,1f) < GameManager.gameManager.crabShellProp)
+        {
+            //En el caso de que se cree con concha será de tipo aleatorio
+            GameObject sh = Instantiate(GameManager.gameManager.shellPrefabs[Random.Range(0, GameManager.gameManager.shellPrefabs.Length)]);
+            ShellController shContr = sh.GetComponent<ShellController>();
+            if (size == 0)
+                size = 1 / GameManager.gameManager.scaleFactor;
+            UpdateCrabSize();
+            shContr.Start();
+            shContr.SetSize(size);
+            GetShell(shContr);
+        }
     }
 
     private void Update()
@@ -139,6 +158,13 @@ public class CrabController : MonoBehaviour
         //Actualizamos el estado de la maquina en el que estemos situados actualmente
         currState.UpdateState();
         MoveLegs();
+    }
+
+    //Actualizar tamaño de escala del modelo del cangrejo
+    public void UpdateCrabSize()
+    {
+        body.localScale = initBodyScale * size * GameManager.gameManager.scaleFactor;
+        rb.mass = size;
     }
 
     protected void MoveLegs()
@@ -158,7 +184,7 @@ public class CrabController : MonoBehaviour
 
             //Comprobamos si se supera el umbral de distancia desde la posicion actual de la punta hasta el punto proyectado
             float dist = Vector3.Distance(hit.point, tip.position);
-            if (dist > legMaxDist)
+            if (dist > legMaxDist*size)
             {
                 //Lanzamos la corrutina de desplazar la pata progresivamente, si hay una corrutina en marcha se para antes para evitar solapes
                 if(tipMovementCorr[i]!=null)
@@ -177,31 +203,14 @@ public class CrabController : MonoBehaviour
         Ray rayAux = new Ray(groundColl.transform.position, Vector3.down);
         RaycastHit hitAux;
         Physics.Raycast(rayAux, out hitAux, Mathf.Infinity, (1 << LayerMask.NameToLayer("Ground")));
-        groundColl.size = new Vector3(groundColl.size.x, Mathf.Clamp((bodyHeight + (averageHeight-hitAux.point.y)),0,bodyHeight*2f)*2f / groundColl.transform.localScale.y, groundColl.size.z);
-
-        ////Rotar cuerpo en funcion de la posición de las patas
-        ////Punto medio patas delanteras
-        //Vector3 aux1 = (tipsEffectors.GetChild(0).position - tipsEffectors.GetChild(2).position)/2f + tipsEffectors.GetChild(2).position;
-        ////Punto medio patas traseras
-        //Vector3 aux2 = (tipsEffectors.GetChild(1).position - tipsEffectors.GetChild(3).position) / 2f + tipsEffectors.GetChild(3).position;
-        //Vector3 dirX = aux1 - aux2;
-        //float angleX = Mathf.Abs(Vector3.SignedAngle(dirX, transform.forward, transform.right));
-
-        ////Punto medio patas derechas
-        //Vector3 aux3 = (tipsEffectors.GetChild(0).position - tipsEffectors.GetChild(1).position) / 2f + tipsEffectors.GetChild(1).position;
-        ////Punto medio patas izquierdas
-        //Vector3 aux4 = (tipsEffectors.GetChild(2).position - tipsEffectors.GetChild(3).position) / 2f + tipsEffectors.GetChild(3).position;
-        //Vector3 dirZ = aux3 - aux4;
-        //float angleZ = Mathf.Abs(Vector3.SignedAngle(dirZ, transform.right, transform.forward));
-
-        //float ang = 0;
-        //Vector3 axis = transform.up;
-        //rb.rotation.ToAngleAxis(out ang, out axis);
-        //rb.rotation = Quaternion.AngleAxis(angleX, transform.right) * Quaternion.AngleAxis(angleZ, transform.forward) * Quaternion.AngleAxis(ang, axis);
-
-
-        //if(grounded)
-        //    rb.position = new Vector3(rb.position.x, height + averageHeight, rb.position.z);
+        if(agent == null)
+        {
+            groundColl.size = new Vector3(groundColl.size.x, Mathf.Clamp((bodyHeight*size + (averageHeight-hitAux.point.y)),0,bodyHeight*size*2f)*2f / groundColl.transform.localScale.y, groundColl.size.z);
+        }
+        else
+        {
+            agent.baseOffset = Mathf.Clamp((bodyHeight * size + (averageHeight - hitAux.point.y)), 0, bodyHeight * size * 2f) * 2f;
+        }
     }
 
     //Funcion para desplazar progresivamente un effector de la animacion como la punta de la pata
@@ -247,14 +256,14 @@ public class CrabController : MonoBehaviour
             {
                 health -= attack;
                 //Si la salud llega a 0, se suelta la concha
-                if(health - discomfort <= 0)
+                if (health - discomfort <= 0)
                 {
                     DropShell();
                 }
                 else
                 {
                     //Aumentar grietas visibles en la concha
-                    shell.SetCrackedMaterial(1-(health/(float)shell.health));
+                    shell.SetCrackedMaterial(1-((health - Mathf.Max(0,discomfort)) / (float)shell.health));
                 }
 
                 StartCoroutine(HitDelay());
@@ -297,7 +306,7 @@ public class CrabController : MonoBehaviour
     {
         //Aimación de defensa
         animator.SetBool(Globals.inputDefence, true);
-        yield return new WaitForSeconds(0.15f);
+        yield return new WaitForSeconds(0.05f);
 
         //Comenzar periodo defensa
         defending = true;
@@ -305,7 +314,7 @@ public class CrabController : MonoBehaviour
         Material mat = GetComponentInChildren<Renderer>().material;
         Color prev = mat.color;
         mat.color = Color.blue;
-        yield return new WaitForSeconds(0.45f);
+        yield return new WaitForSeconds(0.4f);
 
         //Terminar periodo defensa
         mat.color = prev;
@@ -326,6 +335,12 @@ public class CrabController : MonoBehaviour
                 health = shell.health;
                 shellWeight = shell.weight;
                 UpdateSpeed();
+
+                //Si el jugador llega a la concha final ganamos
+                if (_shell.gameObject.name == Globals.finalShell && this == PlayerCrabController.player)
+                {
+                    GameManager.gameManager.Win();
+                }
             }
         }
     }
@@ -350,5 +365,14 @@ public class CrabController : MonoBehaviour
     public void UpdateSpeed()
     {
         speedWeightFactor = 1 - (shellWeight / maxWeight) * (maxSpeedMult - minSpeedMult) + minSpeedMult;
+    }
+
+    private void OnDestroy()
+    {
+        rigBuilder.enabled = false;
+        Destroy(agent);
+        Destroy(rigBuilder);
+        if(tipsEffectors!=null && tipsEffectors.gameObject!=null)
+            Destroy(tipsEffectors.gameObject);
     }
 }

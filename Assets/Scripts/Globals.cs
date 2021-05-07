@@ -20,12 +20,14 @@ public class Globals : MonoBehaviour
     public static string inputAttack = "Attack";
     public static string inputDefence = "Defence";
 
+    public static string finalShell = "FinalShell";
+
 
 
     //GLOBAL FUNCTIONS
 
     //Generación de puntos en una zona asegurando cierta distancia entre cada punto. Crea una rejilla y solo permite que haya un punto en cada celda. 
-    public static List<Vector2> GeneratePoissonDiscPoints (float radius, Vector2 zoneSize, int triesTillRejection = 30)
+    public static List<Vector2> GeneratePoissonDiscPoints (float radius,Bounds bounds, int triesTillRejection = 30)
     {
         //Como el radio es la hipotenusa de un triángulo isósceles utilizamos tma. pitágoras para obtener las dimensiones de la celda cuadrada
         float cellSize = radius / Mathf.Sqrt(2);
@@ -34,7 +36,8 @@ public class Globals : MonoBehaviour
         List<Vector2> points = new List<Vector2>();
         List<Vector2> spawnPoints = new List<Vector2>();
         //Almacenamos los índices de los puntos situados en cada celda
-        int[,] grid = new int[Mathf.CeilToInt(zoneSize.x/cellSize), Mathf.CeilToInt(zoneSize.y/cellSize)];
+        Vector2 zoneSize = new Vector2 (bounds.size.x, bounds.size.z);
+        int[,] grid = new int[Mathf.CeilToInt(zoneSize.x/cellSize)+1, Mathf.CeilToInt(zoneSize.y/cellSize)+1];
 
         //Inicializamos la lista de puntos con el centro de la zona
         spawnPoints.Add(zoneSize / 2f);
@@ -42,7 +45,7 @@ public class Globals : MonoBehaviour
         while (spawnPoints.Count>0)
         {
             //Partimos de un punto aleatorio de los que ya hemos creado
-            int spawnIndex = Random.Range(0, spawnPoints.Count);
+            int spawnIndex = Random. Range(0, spawnPoints.Count);
             Vector2 spawnCenter = spawnPoints[spawnIndex];
 
             bool accepted = false;
@@ -51,7 +54,7 @@ public class Globals : MonoBehaviour
             //Si no es válido se vuelve a probar hasta alcanzar un máximo de intentos
             for(int i = 0; i<triesTillRejection; i++)
             {
-                Vector2 dir = new Vector2(Random.Range(-1, 1), Random.Range(-1, 1)).normalized * Random.Range(radius, radius*2);
+                Vector2 dir = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized * Random.Range(radius, radius*2);
                 Vector2 candidate = spawnCenter + dir;
 
                 //Si es válido se añade a las listas y se para de probar
@@ -70,6 +73,11 @@ public class Globals : MonoBehaviour
             {
                 spawnPoints.RemoveAt(spawnIndex);
             }
+        }
+
+        for(int i = 0; i< points.Count; i++)
+        {
+            points[i] += new Vector2(bounds.center.x, bounds.center.z) - new Vector2(bounds.extents.x, bounds.extents.z);
         }
 
         return points;
@@ -119,11 +127,12 @@ public class Globals : MonoBehaviour
     public static bool GetGroundPoint(Vector2 point2D, Bounds bounds, out Vector3 res)
     {
         RaycastHit hit;
-        Vector3 origin = new Vector3(point2D.x, 100, point2D.y) + bounds.center - bounds.extents;
+        Vector3 origin = new Vector3(point2D.x, 100, point2D.y) + bounds.center;
         Ray ray = new Ray(origin, Vector3.down);
+        //Ingoramos los triggers detectores de los enemigos
+        int layerMask = ~(1 >> LayerMask.NameToLayer("IATriggers"));
 
-        //TODO: Solo tener en cuenta el suelo haciendo uso de las capas
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out hit,Mathf.Infinity, layerMask) && hit.collider.gameObject.CompareTag(tagGround))
         {
             res = hit.point;
             return true;

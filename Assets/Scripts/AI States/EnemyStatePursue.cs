@@ -24,7 +24,11 @@ public class EnemyStatePursue : EnemyState
         //Si tiene objetivo y si se busca una concha que no es de un enemigo o se va a por el enemigo directamente (es mas grande y ha sido atacado) se dirige al objetivo
         if (enemy.currTarget != null && (enemy.currTargetShell != null && (enemy.currTargetShell.transform.parent == null || enemy.currTargetShell.transform.parent == PlayerCrabController.player.transform))
         ||(enemy.currTargetShell == null && enemy.currTarget == PlayerCrabController.player.transform))
+        {
             enemy.agent.destination = enemy.currTarget.position;
+            //Cambiamos la velocidad a más rapido para perseguir
+            enemy.agent.speed = enemy.baseSpeed * enemy.size;
+        }
         //En cualquier otro caso volvemos a wander
         else
             StartWander();

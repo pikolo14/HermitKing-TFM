@@ -23,6 +23,7 @@ public class PlayerCrabController : CrabController
     private float jumpPressedTime = 0;
 
     //Lanzamiento concha
+    [Header("SHELL LAUNCH")]
     public float launchForce;
     public float launchAngle;
 
@@ -35,6 +36,8 @@ public class PlayerCrabController : CrabController
     //Evento para comunicar a las conchas que se ha aumentado de tamaño
     public delegate void SizeEvent(float size);
     public static event SizeEvent SizeCallback;
+
+    public int foodCount = 0; 
 
 
     protected override void Awake()
@@ -118,9 +121,9 @@ public class PlayerCrabController : CrabController
         force.y = 0;
         force = Quaternion.AngleAxis(jumpAngle, -transform.right) * force;
         force.Normalize();
-        force *= Mathf.Lerp(minJumpForce, maxJumpForce, time);
+        force *= Mathf.Lerp(minJumpForce*size, maxJumpForce*size, time);
 
-        //Ignoramos temporalmente la concha para que no interfiera, la soltamos y aplicamos la fuera al jugador
+        //Ignoramos temporalmente la concha para que no interfiera, la soltamos y aplicamos la fuerza al jugador
         StartCoroutine(TempIgnoreColl(shell.gameObject));
         DropShell();
         rb.isKinematic = false;
@@ -153,14 +156,14 @@ public class PlayerCrabController : CrabController
 
     public void OnCollisionEnter(Collision collision)
     {
-        //Comer
-        if(collision.collider.CompareTag(Globals.tagFood))
-        {
-            Eat(GameManager.gameManager.foodSizeIncr);
-            Destroy(collision.collider.gameObject);
-        }
+        ////Comer
+        //if(collision.collider.CompareTag(Globals.tagFood))
+        //{
+        //    Eat(GameManager.gameManager.foodSizeIncr);
+        //    Destroy(collision.collider.gameObject);
+        //}
         //Coger concha si no tenemos una ya equipada
-        else if(collision.collider.CompareTag(Globals.tagShell) && shell==null)
+        if(collision.collider.CompareTag(Globals.tagShell) && shell==null)
         {
             GetShell(collision.collider.GetComponent<ShellController>());
         }
@@ -183,37 +186,45 @@ public class PlayerCrabController : CrabController
             if (dir.magnitude >= 0.1f)
             {
                 Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * dir;
-                rb.MovePosition(rb.position + moveDir * speed * speedWeightFactor * Time.fixedDeltaTime);
+                rb.MovePosition(rb.position + moveDir * baseSpeed * size * speedWeightFactor * Time.fixedDeltaTime);
             }
         }
     }
 
     protected override void Defeat()
     {
-        //TODO
         GameManager.gameManager.Lose();
     }
 
     //Aumentamos el tamaño al comer
-    public void Eat(float sizeIncrease)
+    public void Eat()
     {
-        size += sizeIncrease;
+        size += GameManager.gameManager.foodSizeIncr;
+        Debug.Log(foodCount++ +", "+ size);
+        //Evitamos que crezca demasiado y no quepa en la concha final
+        size = Mathf.Clamp(size, 0, GameManager.gameManager.maxShellSize + GameManager.gameManager.shellSizeTolerance);
         UpdateCrabSize();
 
         //Si lo incomoda que es la concha supera a la vida que le queda, se suelta la concha
         if(shell != null)
         {
             discomfort = shell.GetDisconfort(size);
-            if(discomfort >= health)
-                DropShell();
+
+            //Si es demasiado grande agrietamos la concha
+            if (discomfort > 0)
+            {
+                if(discomfort >= health)
+                    DropShell();
+                else
+                    shell.SetCrackedMaterial(1 - ((health - Mathf.Max(0, discomfort)) / (float)shell.health));
+            }
         }
     }
 
     //Actualizar tamaño de escala del modelo del cangrejo
-    public void UpdateCrabSize()
+    public new void UpdateCrabSize()
     {
-        body.localScale = initBodyScale * size * GameManager.gameManager.scaleFactor;
-        //TODO: ¿Actualizar posición del caparazón teniendo en cuenta tamaño de cangrejo y de caparazon?
+        base.UpdateCrabSize();
 
         //Comunicar a todas las conchas subscritas que se ha aumentado el tamaño para cambiar su visualizacion
         SizeCallback(size);

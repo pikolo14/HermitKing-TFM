@@ -39,19 +39,19 @@ public class ShellController : MonoBehaviour
     {
         //Suscribirse al evento de cambio de tamaño del jugador para cambiar la apariencia de la concha
         PlayerCrabController.SizeCallback += ctx => CheckAvailability(ctx);
-        CheckAvailability(PlayerCrabController.player.size);
+
+        initScale = transform.localScale;
     }
 
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         coll = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
-        initScale = transform.localScale;
         explosionColl.radius = explosionRadius;
 
         //Si no esta sobre un cangrejo se inicializa su tamaño aleatoriamente (si no se asigna manualmente)
-        if(anchorPoint == null)
+        if(anchorPoint == null && size == 0)
         {
             //Inicializar con un tamaño aleatorio
             float ranSize = Random.Range(GameManager.gameManager.minShellSize, GameManager.gameManager.maxShellSize);
@@ -59,6 +59,7 @@ public class ShellController : MonoBehaviour
         }
 
         //Preparamos material de la concha
+        //CheckAvailability(PlayerCrabController.player.size);
         rend = GetComponentInChildren<Renderer>();
         SetCrackedMaterial(0);
     }
@@ -81,7 +82,6 @@ public class ShellController : MonoBehaviour
         //Actualizar escala con ese tamaño
         transform.localScale = initScale * size * GameManager.gameManager.scaleFactor;
     }
-
 
     public float GetDisconfort(float crabSize)
     {
@@ -169,6 +169,7 @@ public class ShellController : MonoBehaviour
     //Modificar la apariencia de la concha en funcion de la vida que quede
     public void SetCrackedMaterial(float cracked)
     {
+        Debug.Log(cracked);
         Material material = new Material(rend.material);
         material.SetFloat("CrackedQuantity", cracked);
         rend.material = material;
@@ -223,5 +224,10 @@ public class ShellController : MonoBehaviour
 
             rend.material = material;
         }
+    }
+
+    public void OnDestroy()
+    {
+        PlayerCrabController.SizeCallback -= ctx => CheckAvailability(ctx);
     }
 }
