@@ -1,5 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-5472935801471022088
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 4
 --- !u!21 &2100000
 Material:
   serializedVersion: 6
@@ -8,11 +21,11 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: IL3DN_Plant_Grass_02
-  m_Shader: {fileID: 4800000, guid: 8bb76156a4f696249ac78cae0f1a0ade, type: 3}
-  m_ShaderKeywords: EFFECT_HUE_VARIATION GEOM_TYPE_LEAF _BEND_ON _WIGGLE_ON _WIND_ON
+  m_Shader: {fileID: 4800000, guid: 99134b1f0c27d54469a840832a28fadf, type: 3}
+  m_ShaderKeywords: GEOM_TYPE_LEAF _BEND_ON _WIGGLE_ON _WINDQUALITY_BEST _WIND_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
-  m_DoubleSidedGI: 0
+  m_DoubleSidedGI: 1
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
@@ -47,6 +60,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _ExtraTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _GlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -68,6 +85,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ShadowOffset:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SubsurfaceTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -99,6 +120,8 @@ Material:
     - _AlphaCutoff: 0.5
     - _Bend: 1
     - _BendStrenght: 1
+    - _BillboardKwToggle: 0
+    - _BillboardShadowFade: 0.5
     - _BumpScale: 1
     - _Cull: 0
     - _Cutoff: 0.5
@@ -109,11 +132,13 @@ Material:
     - _Float0: 1
     - _Float1: 10
     - _GlossMapScale: 1
-    - _Glossiness: 0
+    - _Glossiness: 0.416
     - _GlossyReflections: 1
+    - _HueVariationKwToggle: 0
     - _MaxWindStrength: 0.56
     - _Metallic: 0
     - _Mode: 0
+    - _NormalMapKwToggle: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _Rotation: 0.6
@@ -131,6 +156,8 @@ Material:
     - _SrcBlend: 1
     - _Strenght: 0.4
     - _StrenghtNoise: 1
+    - _SubsurfaceIndirect: 0
+    - _SubsurfaceKwToggle: 0
     - _ToggleSwitch0: 0
     - _TransAmbient: 1
     - _TransDirect: 1
@@ -139,6 +166,7 @@ Material:
     - _TransShadow: 1
     - _Translucency: 1
     - _TranslucencyViewDependency: 0
+    - _TwoSided: 0
     - _UVSec: 0
     - _Wiggle: 1
     - _WiggleRandomisation: 0.21
@@ -157,8 +185,11 @@ Material:
     - _Color1: {r: 1, g: 1, b: 1, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
     - _HueVariation: {r: 1, g: 1, b: 1, a: 1}
+    - _HueVariationColor: {r: 1, g: 0.5, b: 0, a: 0.1}
     - _SnowColor: {r: 1, g: 1, b: 1, a: 0}
     - _Speed: {r: -0, g: 10, b: 0, a: 0}
+    - _SubsurfaceColor: {r: 1, g: 1, b: 1, a: 1}
     - _TranslucencyColor: {r: 0.72321427, g: 1, b: 0, a: 1}
     - _TreeInstanceColor: {r: 1, g: 1, b: 1, a: 1}
     - _TreeInstanceScale: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []

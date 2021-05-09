@@ -11,13 +11,15 @@ GameObject:
   - component: {fileID: 2386084138679995814}
   - component: {fileID: 732029770716582941}
   - component: {fileID: 4009059634023910087}
-  - component: {fileID: -5357028360407859894}
+  - component: {fileID: -7564937570973613079}
+  - component: {fileID: 1316903174890632316}
+  - component: {fileID: -353244019499186570}
   m_Layer: 0
   m_Name: Object005
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &2386084138679995814
 Transform:
@@ -82,8 +84,35 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &-5357028360407859894
-MeshCollider:
+--- !u!205 &-7564937570973613079
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2407047607615855260}
+  serializedVersion: 2
+  m_LocalReferencePoint: {x: -0.000000014901161, y: -0.000000020489097, z: -0.0000000018626451}
+  m_Size: 0.043367904
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.03722526
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 4009059634023910087}
+  - screenRelativeHeight: 0.017994493
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 4009059634023910087}
+  - screenRelativeHeight: 0.003972058
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 4009059634023910087}
+  m_Enabled: 1
+--- !u!136 &1316903174890632316
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -92,7 +121,23 @@ MeshCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 1
-  m_CookingOptions: -1
-  m_Mesh: {fileID: 9186633843763367028, guid: bad875bc18793704ca1a1fbd1c4b39ce, type: 3}
+  m_Radius: 0.017160837
+  m_Height: 0.04346154
+  m_Direction: 1
+  m_Center: {x: 0.001095426, y: 0.00078459736, z: -0.000026631356}
+--- !u!208 &-353244019499186570
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2407047607615855260}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.020000001, y: 0.022000002, z: 0.017}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
