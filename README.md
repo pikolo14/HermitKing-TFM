@@ -8,6 +8,7 @@
 - Defenderse temporalmente: Clic derecho / Gatillo LT
 - Salto para dejar la concha (mantener para saltar mas lejos): Espacio / Botón A
 - Lanzamiento de la concha hacia delante: Q / Botón X
+- Pausa: Escape / Botón start
 
 
 **BUILDS Y SHOWCASE:**
