@@ -1,5 +1,17 @@
 # TFM: "Hermit King"
 
+
+**CONTROLES:**
+- Movimiento: WASD / Joystick izquierdo
+- Cámara: Ratón / Joystick derecho
+- Atacar: Clic izquierdo / Gatillo RT
+- Defenderse temporalmente: Clic derecho / Gatillo LT
+- Salto para dejar la concha (mantener para saltar mas lejos): Espacio / Botón A
+- Lanzamiento de la concha hacia delante: Q / Botón X
+
+
+**BUILDS Y SHOWCASE:**
+
 Dentro del proyecto en la carpeta "Builds" se puede  acceder a la build de cada entrega. 
 
 Para ver un seguimiento de las tareas realizadas y por realizar se pude acceder a través de estos enlaces al proyecto creado en la plataforma ClickUp que se utiliza tanto con el fin de documentar qué se ha realizado en cada tarea con videos e imágenes, como con fines organizativos y de planificación.
