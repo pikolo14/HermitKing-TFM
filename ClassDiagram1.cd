@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="GameManager">
+    <Position X="13.25" Y="0.5" Width="2.25" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>CEAAYABAAIEAEAAFBUCAgAkFACLQhAIBABAMAIAIKEg=</HashCode>
+      <FileName>Assets\Scripts\GameManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CrabController">
+    <Position X="8.5" Y="4.75" Width="3.25" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>HASTAUCAAqkgAQK1AJABEQDgSzIDg4BgAmABAhJKKOw=</HashCode>
+      <FileName>Assets\Scripts\CrabController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlayerCrabController">
+    <Position X="12.75" Y="4.75" Width="3.25" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="PlayerCrabController.SizeEvent" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\PlayerCrabController.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ARaJPASAEoAAAACkAAAAAAAAIABABQApgEAAAgAKCGA=</HashCode>
+      <FileName>Assets\Scripts\PlayerCrabController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AttackController">
+    <Position X="5.25" Y="3" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACgBAAECAAAAAAAAAMAAAAAAAAAAAAEAAAI=</HashCode>
+      <FileName>Assets\Scripts\AttackController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExplosionController">
+    <Position X="20.75" Y="4.75" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgBAAAAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\ExplosionController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FoodDetector" Collapsed="true">
+    <Position X="13.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAABAAAAABQAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\FoodDetector.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ShellController">
+    <Position X="17" Y="4.75" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAwBACAgwCAQAAAGAKAIAgIAABACAAAoCAgA0AABAEg=</HashCode>
+      <FileName>Assets\Scripts\ShellController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="EnemyState">
+    <Position X="5.25" Y="6.25" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="EnemyState.TriggerType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\AI States\EnemyState.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAABAAAAAAEAQAIAAAAIAAQAAABAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\AI States\EnemyState.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
