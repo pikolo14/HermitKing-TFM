@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.SceneManagement;
 
 public class CrabController : MonoBehaviour
 {
@@ -61,7 +62,7 @@ public class CrabController : MonoBehaviour
 
     [Header("IA")]
     public NavMeshAgent agent = null;
-    public float slowSpeedMult, wanderTargetMinDist, wanderTargetMaxDist, wanderTargetAngle;
+    public float slowSpeedMult, wanderTargetMinDist, wanderTargetMaxDist, wanderTargetAngle, attackRotation;
     [Range(0,1)]
     public float wanderWaitProbability; //Valor random que altera la probabilidad de hacer esperas en el wander del cangrejo
     public float wanderWaitMinTime, wanderWaitMaxTime;
@@ -96,8 +97,6 @@ public class CrabController : MonoBehaviour
     public GameObject hitParticles;
     public GameObject defenseParticles;
     public ParticleSystem dustParticles;
-
-    protected bool isQuitting = false;
 
 
     protected virtual void Awake()
@@ -403,13 +402,9 @@ public class CrabController : MonoBehaviour
             Destroy(tipsEffectors.gameObject);
 
         //Generamos una nube de particulas si no se está destruyendo la instancia antes de cerrar el juego para evitar errores
-        if (!isQuitting)
+        if (!GameManager.isQuitting)
+        {
             Instantiate(deathParticles, transform.position, new Quaternion()).SetActive(true);
-    }
-
-    //Evitamos errores al cerrar la aplicación
-    protected void OnApplicationQuit()
-    {
-        isQuitting = true;
+        }
     }
 }

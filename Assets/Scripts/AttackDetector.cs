@@ -15,7 +15,7 @@ public class AttackDetector : MonoBehaviour
     }
 
     //Detectamos si golpeamos a alguien
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         //Si estamos en un enemigo y entramos en el cuerpo del jugador, dañamos al jugador
         if (gameObject.CompareTag(Globals.tagEnemy) && other.CompareTag(Globals.tagPlayer))

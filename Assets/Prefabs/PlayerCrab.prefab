@@ -1268,6 +1268,7 @@ MonoBehaviour:
   wanderTargetMinDist: 0
   wanderTargetMaxDist: 0
   wanderTargetAngle: 0
+  attackRotation: 10
   wanderWaitProbability: 0
   wanderWaitMinTime: 0
   wanderWaitMaxTime: 0

@@ -64,6 +64,8 @@ public class ShellController : MonoBehaviour
         //CheckAvailability(PlayerCrabController.player.size);
         rend = GetComponentInChildren<Renderer>();
         SetCrackedMaterial(0);
+
+        CheckAvailability(PlayerCrabController.player.size);
     }
 
     // Update is called once per frame

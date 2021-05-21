@@ -27,7 +27,12 @@ public class EnemyStateAttack : EnemyState
         {
             //Se sigue dirigiendo al jugador y ataca de vez en cuando
             enemy.agent.destination = enemy.currTarget.position;
-            if(nextAttackTime <= 0)
+            //Mirar al jugador
+            Vector3 direction = (enemy.currTarget.position - enemy.transform.position).normalized;
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            enemy.transform.rotation = Quaternion.Slerp(enemy.transform.rotation, lookRotation, Time.deltaTime * enemy.attackRotation);
+
+            if (nextAttackTime <= 0)
             {
                 enemy.attackContr.Attack();
                 nextAttackTime = Random.Range(enemy.attackMinDelay, enemy.attackMaxDelay);

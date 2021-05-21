@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -47,12 +48,14 @@ public class GameManager : MonoBehaviour
 
     [Header("DEBUG")]
     public bool enabledGeneration = true;
+    public static bool isQuitting = false;
 
     private void Awake()
     {
         if(gameManager == null)
         {
             gameManager = this;
+            SceneManager.activeSceneChanged += OnSceneUnloaded;
         }
         else
         {
@@ -246,5 +249,25 @@ public class GameManager : MonoBehaviour
         finished = true;
         victoryScreen.SetActive(true);
         selectButtonWin.Select();
+    }
+
+    private void OnDestroy()
+    {
+        ParticleSystem[] parts = FindObjectsOfType<ParticleSystem>();
+        for(int i=0; i<parts.Length; i++)
+        {
+            Destroy(parts[i].gameObject);
+        }
+    }
+
+    //Evitamos errores al cerrar la aplicación
+    protected void OnApplicationQuit()
+    {
+        isQuitting = true;
+    }
+
+    public void OnSceneUnloaded(Scene scene, Scene scene2)
+    {
+        isQuitting = true;
     }
 }
