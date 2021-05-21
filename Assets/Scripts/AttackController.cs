@@ -8,6 +8,8 @@ public class AttackController : MonoBehaviour
     private CrabController controller;
     private bool enemy = false;
     public float attackDuration = 0.5f;
+    public GameObject hitParticles;
+    public bool attacking = false;
 
 
     void Start()
@@ -42,6 +44,8 @@ public class AttackController : MonoBehaviour
     //Animación de ataque y activacion de collider de ataque
     public IEnumerator AttackDuration(float duration)
     {
+        attacking = true;
+
         //Animacion de ataque
         controller.animator.SetBool(Globals.inputAttack, true);
         yield return new WaitForSeconds(0.5f);
@@ -55,22 +59,27 @@ public class AttackController : MonoBehaviour
         mat.color = Color.red;
 
         //Desactivamos el collider
-        yield return new WaitForSeconds(attackDuration);
+        //yield return new WaitForSeconds(attackDuration);
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
         mat.color = prev;
         foreach (Collider c in colls)
             c.enabled = false;
+
+        attacking = false;
     }
 
     //Devuelve si se está atacando
     public bool IsAttacking()
     {
-        if(colls[0]!=null)
-            return colls[0].enabled;
-        else return false;
+        //if(colls[0]!=null)
+        //    return colls[0].enabled;
+        //else return false;
+        return attacking;
     }
 
     //Comunicar el golpe al cangrejo contrincante en función de la diferencia de tamaños
-    public void HitCrab(GameObject crab)
+    public void HitCrab(GameObject crab, Vector3 hitPos)
     {
         CrabController advContr;
 
@@ -82,6 +91,6 @@ public class AttackController : MonoBehaviour
         //El aumento de daño se incrementa en enteros en funcion del valor que hemos puesto de margen. El mínimo siempre será 1
         int damage = Mathf.Max((int)(Mathf.Floor((controller.size - advContr.size)/GameManager.gameManager.sizeDiffAttackStep) +1), 1);
 
-        advContr.GetHit(damage);
+        advContr.GetHit(damage, hitPos);
     }
 }

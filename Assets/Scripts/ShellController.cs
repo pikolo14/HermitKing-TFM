@@ -22,7 +22,9 @@ public class ShellController : MonoBehaviour
     public Vector3 initScale;
 
     //Tiempo que se ignora al cangrejo despues de soltar la concha
-    public static float ignoreCollTime = 3;
+    public float ignoreCollTime = 4;
+    public float reoccupyDelay = 1;
+
     public GameObject ignoredCrab;
 
     //Punto del cangrejo en el que se debe colocar continuamente (evitamos escalar la concha con el cangrejo)
@@ -32,6 +34,7 @@ public class ShellController : MonoBehaviour
     public SphereCollider explosionColl;
     public float explosionDamage;
     public float explosionRadius;
+    public bool habitable = true;
     bool explosionReady = false;
 
 
@@ -39,7 +42,6 @@ public class ShellController : MonoBehaviour
     {
         //Suscribirse al evento de cambio de tamaño del jugador para cambiar la apariencia de la concha
         PlayerCrabController.SizeCallback += ctx => CheckAvailability(ctx);
-
         initScale = transform.localScale;
     }
 
@@ -135,6 +137,7 @@ public class ShellController : MonoBehaviour
         //Ignoramos durante el lanzamiento el suelo
         StartCoroutine(IgnoreColliderTemporarily(GameObject.FindGameObjectWithTag(Globals.tagGround), 0.2f));
         //Aplicamos la fuerza a la concha para lanzarla e indicamos que va a explotar al tocar algo
+        rb.drag = 0;
         rb.AddForce(force, ForceMode.Impulse);
         explosionReady = true;
     }
@@ -143,16 +146,21 @@ public class ShellController : MonoBehaviour
     public IEnumerator IgnoreCrabTemporarily(GameObject ignored, float time)
     {
         ignoredCrab = ignored;
+        habitable = false;
+        yield return new WaitForSeconds(reoccupyDelay);
+        habitable = true;
         yield return new WaitForSeconds(time);
         ignoredCrab = null;
     }
 
     public IEnumerator IgnoreColliderTemporarily(GameObject ignored, float time)
     {
-        Collider ignoredColl = ignored.GetComponent<Collider>();
-        Physics.IgnoreCollision(coll, ignoredColl, true);
+        //Collider ignoredColl = ignored.GetComponent<Collider>();
+        //Physics.IgnoreCollision(coll, ignoredColl, true);
+        coll.enabled = false;
         yield return new WaitForSeconds(time);
-        Physics.IgnoreCollision(coll, ignoredColl, false);
+        coll.enabled = true;
+        //Physics.IgnoreCollision(coll, ignoredColl, false);
     }
 
     //Explotamos la concha al tocar cualquier superficie haciendo daño en area

@@ -1,0 +1,24 @@
+#
+# Sprite sheet data for Unity.
+#
+# To import these sprites into your Unity project, download "TexturePackerImporter":
+# https://www.codeandweb.com/texturepacker/unity
+#
+# $TexturePacker:SmartUpdate:3946371d7f2041a55588f6d971ac1f99:cc081f5d3318d7c2afe4d4d4ba843d89:42290dc34ece10bb4f609f6a5320ec8a$
+#
+:format=40300
+:texture=med_sheet.png
+:size=2048x2048
+:pivotpoints=enabled
+:borders=disabled
+:alphahandling=ClearTransparentPixels
+
+shell_pieces_med_0000_Capa-3;0;1534;505;514; 0.5;0.5; 0;0;0;0
+shell_pieces_med_0001_Capa-4;519;1534;424;514; 0.5;0.5; 0;0;0;0
+shell_pieces_med_0002_Capa-5;1038;1527;508;521; 0.5;0.5; 0;0;0;0
+shell_pieces_med_0003_Capa-6;0;1021;479;506; 0.5;0.5; 0;0;0;0
+shell_pieces_med_0004_Capa-7;519;1015;511;512; 0.5;0.5; 0;0;0;0
+shell_pieces_med_0005_Capa-8;1038;1019;487;508; 0.5;0.5; 0;0;0;0
+shell_pieces_med_0006_Capa-9;0;509;519;497; 0.5;0.5; 0;0;0;0
+shell_pieces_med_0007_Capa-10;519;493;485;513; 0.5;0.5; 0;0;0;0
+shell_pieces_med_0008_Capa-11;1038;490;474;516; 0.5;0.5; 0;0;0;0

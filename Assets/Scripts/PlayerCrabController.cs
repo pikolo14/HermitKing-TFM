@@ -165,7 +165,12 @@ public class PlayerCrabController : CrabController
         //Coger concha si no tenemos una ya equipada
         if(collision.collider.CompareTag(Globals.tagShell) && shell==null)
         {
-            GetShell(collision.collider.GetComponent<ShellController>());
+            ShellController contr = collision.collider.GetComponent<ShellController>();
+            if(contr == null)
+            {
+                contr = collision.collider.GetComponentInParent<ShellController>();
+            }
+            GetShell(contr);
         }
     }
 
@@ -199,10 +204,14 @@ public class PlayerCrabController : CrabController
         {
             //Evitar que el cangrejo se mueva solo cuando no se tocan los controles, como en una pendiente
             rb.velocity = new Vector3(0,rb.velocity.y, 0);
+            if (dustParticles.isPaused)
+                dustParticles.Play();
         }
         else
         {
             Debug.DrawRay(transform.position, Vector3.down, Color.red);
+            if(!dustParticles.isPaused)
+                dustParticles.Pause();
         }
     }
 

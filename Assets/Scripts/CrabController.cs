@@ -91,6 +91,14 @@ public class CrabController : MonoBehaviour
     public float effectorMoveTime = 0.2f;
     public float bodyHeight = 0.5f;
 
+    [Header("PARTICLES")]
+    public GameObject deathParticles;
+    public GameObject hitParticles;
+    public GameObject defenseParticles;
+    public ParticleSystem dustParticles;
+
+    protected bool isQuitting = false;
+
 
     protected virtual void Awake()
     {
@@ -236,19 +244,38 @@ public class CrabController : MonoBehaviour
     
     
     //Recibir un golpe y perder vida
-    public void GetHit(int attack)
+    public void GetHit(int attack, Vector3 hitPos)
     {
         //Si se está defendiendo se esquiva el golpe
         if(defending)
         {
             Debug.Log("DEFENSA UH UH");
+            //Instanciamos las particulas escaladas en nfuncion del tamaño del cangrejo
+            GameObject go = Instantiate(defenseParticles);
+            go.transform.localScale *= Mathf.Max(size - 1.5f, 1);
+            //Fix escalar gravedad, para tener un comportamiento igual idependeintemente del tamaño
+            ParticleSystem.MainModule _psm_main = go.GetComponent<ParticleSystem>().main;
+            _psm_main.gravityModifierMultiplier *= Mathf.Max(size - 1.5f, 1);
+            go.transform.position = hitPos;
         }
         //Si se le puede golpear...
         else if(hittable)
         {
             Debug.Log("Hit: "+attack);
 
-            if(currState != null)
+            //Instanciamos particulas de impacto en el caso de que sean golpeados por pinzas, no explosiones
+            if(hitPos!= Vector3.zero)
+            {
+                //Instanciamos las particulas escaladas en nfuncion del tamaño del cangrejo
+                GameObject go = Instantiate(hitParticles);
+                go.transform.localScale *= Mathf.Max(size-1.5f, 1);
+                //Fix escalar gravedad, para tener un comportamiento igual idependeintemente del tamaño
+                ParticleSystem.MainModule _psm_main = go.GetComponent<ParticleSystem>().main;
+                _psm_main.gravityModifierMultiplier *= Mathf.Max(size - 1.5f, 1);
+                go.transform.position = hitPos;
+            }
+
+            if (currState != null)
                 currState.Impact();
 
             //Si tiene concha pierde los puntos de vida del ataque del enemigo
@@ -266,13 +293,14 @@ public class CrabController : MonoBehaviour
                     shell.SetCrackedMaterial(1-((health - Mathf.Max(0,discomfort)) / (float)shell.health));
                 }
 
-                StartCoroutine(HitDelay());
             }
             //Si no tiene concha, muere
             else 
             {
                 Defeat();
             }
+
+            StartCoroutine(HitDelay());
         }
     }
 
@@ -289,7 +317,6 @@ public class CrabController : MonoBehaviour
     {
         Debug.Log("Un ermitaño ha muerto");
         Destroy(gameObject);
-        //TODO
     }
 
 
@@ -306,7 +333,7 @@ public class CrabController : MonoBehaviour
     {
         //Aimación de defensa
         animator.SetBool(Globals.inputDefence, true);
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSeconds(0.04f);
 
         //Comenzar periodo defensa
         defending = true;
@@ -314,7 +341,7 @@ public class CrabController : MonoBehaviour
         Material mat = GetComponentInChildren<Renderer>().material;
         Color prev = mat.color;
         mat.color = Color.blue;
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(time);
 
         //Terminar periodo defensa
         mat.color = prev;
@@ -324,7 +351,7 @@ public class CrabController : MonoBehaviour
     //Coger una nueva concha
     public void GetShell(ShellController _shell)
     {
-        if(_shell.GetDisconfort(size) == 0)
+        if(_shell.GetDisconfort(size) == 0 && _shell.habitable)
         {
             //Asociamos la concha al cangrejo y la ponemos en un punto en la espalda
             //Si hace poco que la hemos soltado, no nos permitirá cogerla
@@ -374,5 +401,15 @@ public class CrabController : MonoBehaviour
         Destroy(rigBuilder);
         if(tipsEffectors!=null && tipsEffectors.gameObject!=null)
             Destroy(tipsEffectors.gameObject);
+
+        //Generamos una nube de particulas si no se está destruyendo la instancia antes de cerrar el juego para evitar errores
+        if (!isQuitting)
+            Instantiate(deathParticles, transform.position, new Quaternion()).SetActive(true);
+    }
+
+    //Evitamos errores al cerrar la aplicación
+    protected void OnApplicationQuit()
+    {
+        isQuitting = true;
     }
 }

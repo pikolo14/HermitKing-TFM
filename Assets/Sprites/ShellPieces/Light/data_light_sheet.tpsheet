@@ -1,0 +1,24 @@
+#
+# Sprite sheet data for Unity.
+#
+# To import these sprites into your Unity project, download "TexturePackerImporter":
+# https://www.codeandweb.com/texturepacker/unity
+#
+# $TexturePacker:SmartUpdate:9f570c172b72d8eae69cc5d0357942d3:9941fc1023a03699dccecc2e8a75c78f:739bf1ea798c8c9aefe387e61561c75f$
+#
+:format=40300
+:texture=shell_light_sheet.png
+:size=1024x1024
+:pivotpoints=enabled
+:borders=disabled
+:alphahandling=ClearTransparentPixels
+
+shell_pieces_light_0000_Capa-2;0;775;264;249; 0.5;0.5; 0;0;0;0
+shell_pieces_light_0001_Capa-3;265;769;252;255; 0.5;0.5; 0;0;0;0
+shell_pieces_light_0002_Capa-4;530;815;265;209; 0.5;0.5; 0;0;0;0
+shell_pieces_light_0003_Capa-5;0;511;254;246; 0.5;0.5; 0;0;0;0
+shell_pieces_light_0004_Capa-6;265;505;260;252; 0.5;0.5; 0;0;0;0
+shell_pieces_light_0005_Capa-7;530;502;249;255; 0.5;0.5; 0;0;0;0
+shell_pieces_light_0006_Capa-8;0;223;221;267; 0.5;0.5; 0;0;0;0
+shell_pieces_light_0007_Capa-9;265;229;192;261; 0.5;0.5; 0;0;0;0
+shell_pieces_light_0008_Capa-10;530;257;263;233; 0.5;0.5; 0;0;0;0

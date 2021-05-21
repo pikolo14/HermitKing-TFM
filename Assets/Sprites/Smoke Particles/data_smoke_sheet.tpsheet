@@ -1,0 +1,21 @@
+#
+# Sprite sheet data for Unity.
+#
+# To import these sprites into your Unity project, download "TexturePackerImporter":
+# https://www.codeandweb.com/texturepacker/unity
+#
+# $TexturePacker:SmartUpdate:cf949dadad3571241d9dee7e854d53d0:b3481f8fd0f69ab6da7ae135aec5bd57:f2613b9768fc0df1ad48cd9e2c76aaef$
+#
+:format=40300
+:texture=smoke_sheet.png
+:size=1024x256
+:pivotpoints=enabled
+:borders=disabled
+:alphahandling=ClearTransparentPixels
+
+smoke-particles_0000_Capa-1;0;102;163;154; 0.5;0.5; 0;0;0;0
+smoke-particles_0001_Capa-2;163;147;147;109; 0.5;0.5; 0;0;0;0
+smoke-particles_0002_Capa-3;326;147;150;109; 0.5;0.5; 0;0;0;0
+smoke-particles_0003_Capa-4;489;170;120;86; 0.5;0.5; 0;0;0;0
+smoke-particles_0004_Capa-5;652;183;115;73; 0.5;0.5; 0;0;0;0
+smoke-particles_0005_Capa-6;163;147;147;109; 0.5;0.5; 0;0;0;0

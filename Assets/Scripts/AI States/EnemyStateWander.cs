@@ -29,7 +29,7 @@ public class EnemyStateWander : EnemyState
             direction *= Random.Range(enemy.wanderTargetMinDist*enemy.size, enemy.wanderTargetMaxDist*enemy.size);
             direction.y = 0;
             Vector3 point = direction + enemy.agent.transform.position;
-            point.y = 0;
+            point.y = enemy.transform.position.y;
             enemy.agent.destination = point;
 
             //Cambiamos la velocidad a más lento para caminar

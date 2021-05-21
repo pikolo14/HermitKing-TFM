@@ -1,0 +1,24 @@
+#
+# Sprite sheet data for Unity.
+#
+# To import these sprites into your Unity project, download "TexturePackerImporter":
+# https://www.codeandweb.com/texturepacker/unity
+#
+# $TexturePacker:SmartUpdate:7195d3f307a7c211a886add981b979b4:19896e96ad1a55b045b43e52b919926c:06ff7d975133f216eccbd80b8498a041$
+#
+:format=40300
+:texture=shell_heavy_sheet.png
+:size=2048x512
+:pivotpoints=enabled
+:borders=disabled
+:alphahandling=ClearTransparentPixels
+
+shell_pieces_heavy_0000_Capa-2;0;280;217;232; 0.5;0.5; 0;0;0;0
+shell_pieces_heavy_0001_Capa-3;243;270;219;242; 0.5;0.5; 0;0;0;0
+shell_pieces_heavy_0002_Capa-4;486;272;217;240; 0.5;0.5; 0;0;0;0
+shell_pieces_heavy_0003_Capa-5;729;269;223;243; 0.5;0.5; 0;0;0;0
+shell_pieces_heavy_0004_Capa-6;972;272;220;240; 0.5;0.5; 0;0;0;0
+shell_pieces_heavy_0005_Capa-7;1215;284;243;228; 0.5;0.5; 0;0;0;0
+shell_pieces_heavy_0006_Capa-8;1458;285;241;227; 0.5;0.5; 0;0;0;0
+shell_pieces_heavy_0007_Capa-9;1701;274;230;238; 0.5;0.5; 0;0;0;0
+shell_pieces_heavy_0008_Capa-10;0;31;196;238; 0.5;0.5; 0;0;0;0

@@ -5,8 +5,14 @@ using UnityEngine;
 public class AttackDetector : MonoBehaviour
 {
     //Evento para comunicar al attackController del atacante que se le ha dado a alguien
-    public delegate void HitEvent(GameObject crab);
+    public delegate void HitEvent(GameObject crab, Vector3 pos);
     public event HitEvent HitCallback;
+    public SphereCollider coll;
+
+    public void Awake()
+    {
+        coll = GetComponent<SphereCollider>();
+    }
 
     //Detectamos si golpeamos a alguien
     private void OnTriggerEnter(Collider other)
@@ -16,7 +22,11 @@ public class AttackDetector : MonoBehaviour
         {
             try
             {
-                HitCallback(other.gameObject);
+                //Obtenemos el punto cercano a la superficie del collider de la pinza en la dirección en la que está el collider enemigo
+                Vector3 dir = other.transform.position - transform.position;
+                dir = dir.normalized * coll.radius * 0.9f;
+
+                HitCallback(other.gameObject, dir+transform.position);
             }
             catch { }
             //PlayerCrabController player = other.GetComponentInParent<PlayerCrabController>();
@@ -27,7 +37,11 @@ public class AttackDetector : MonoBehaviour
         {        
             try
             {
-                HitCallback(other.gameObject);
+                //Obtenemos el punto cercano a la superficie del collider de la pinza en la dirección en la que está el collider enemigo
+                Vector3 dir = other.transform.position - transform.position;
+                dir = dir.normalized * coll.radius * 0.9f;
+
+                HitCallback(other.gameObject, dir + transform.position);
             }
             catch { }
             //CrabController enemy = other.GetComponentInParent<CrabController>();
