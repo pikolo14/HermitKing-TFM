@@ -10,6 +10,8 @@ public class AttackController : MonoBehaviour
     public float attackDuration = 0.5f;
     public GameObject hitParticles;
     public bool attacking = false;
+    private IEnumerator attackCorr = null;
+    public bool damage = false;
 
 
     void Start()
@@ -17,7 +19,7 @@ public class AttackController : MonoBehaviour
         //Nos suscribimos al evento de golpear a un cangrejo contrincante en los dos detectores
         foreach(Collider c in colls)
         {
-            c.enabled = false;
+            //c.enabled = false;
             c.gameObject.GetComponent<AttackDetector>().HitCallback += HitCrab;
         }
 
@@ -51,20 +53,23 @@ public class AttackController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         //Activamos el collider de ataque
-        foreach (Collider c in colls)
-            c.enabled = true;
+        //foreach (Collider c in colls)
+        //    c.enabled = true;
+        damage = true;
+
         //DEBUG
         Material mat = transform.parent.GetComponentInChildren<Renderer>().material;
         Color prev = mat.color;
         mat.color = Color.red;
 
         //Desactivamos el collider
-        //yield return new WaitForSeconds(attackDuration);
-        yield return new WaitForEndOfFrame();
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(attackDuration);
+        //yield return new WaitForEndOfFrame();
+        //yield return new WaitForEndOfFrame();
         mat.color = prev;
-        foreach (Collider c in colls)
-            c.enabled = false;
+        //foreach (Collider c in colls)
+        //    c.enabled = false;
+        damage = false;
 
         attacking = false;
     }

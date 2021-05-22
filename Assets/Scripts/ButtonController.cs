@@ -8,9 +8,13 @@ public class ButtonController : MonoBehaviour
     //Cambiar de escena con los botones
     public void SwitchScene(string scene)
     {
-        //TODO:
         if (scene == "Credits")
             Debug.Log("Mostrar creditos (TODO)");
+        else if(SceneManager.GetActiveScene().name == "Main")
+        {
+            GameManager.isQuitting = true;
+            SceneManager.LoadScene(scene);
+        }
         else
             SceneManager.LoadScene(scene);
     }

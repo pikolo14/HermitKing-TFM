@@ -55,7 +55,6 @@ public class GameManager : MonoBehaviour
         if(gameManager == null)
         {
             gameManager = this;
-            SceneManager.activeSceneChanged += OnSceneUnloaded;
         }
         else
         {
@@ -75,6 +74,8 @@ public class GameManager : MonoBehaviour
         PlayerCrabController.SizeCallback += ContinuousGeneration;
         nextGenerationSize = 1 / scaleFactor;
         enemyControllerPrefab = enemyPrefab.GetComponent<CrabController>();
+
+        isQuitting = false;
     }
 
     //Pausar/despausar
@@ -94,6 +95,7 @@ public class GameManager : MonoBehaviour
             else
             {
                 Time.timeScale = 0;
+                
                 if(showMenu)
                 {
                     selectButtonPause.Select();
@@ -167,6 +169,7 @@ public class GameManager : MonoBehaviour
             Vector3 pos;
             if (Globals.GetGroundPoint(points2D[index], bounds, out pos))
             {
+                pos += Vector3.up * 0.15f;
                 Quaternion rot = Quaternion.AngleAxis(Random.Range(0, 360), Vector3.up);
                 objs.Enqueue(Instantiate(prefab, pos, rot));
             }
@@ -253,6 +256,7 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        Time.timeScale = 1;
         ParticleSystem[] parts = FindObjectsOfType<ParticleSystem>();
         for(int i=0; i<parts.Length; i++)
         {
@@ -262,11 +266,6 @@ public class GameManager : MonoBehaviour
 
     //Evitamos errores al cerrar la aplicación
     protected void OnApplicationQuit()
-    {
-        isQuitting = true;
-    }
-
-    public void OnSceneUnloaded(Scene scene, Scene scene2)
     {
         isQuitting = true;
     }

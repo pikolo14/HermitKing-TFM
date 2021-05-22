@@ -7,6 +7,7 @@ public class EnemyStateWander : EnemyState
 {
     CrabController enemy;
     private float remainingWait = 0;
+    private float currTargetTime = 0;
 
     public EnemyStateWander(CrabController contr)
     {
@@ -16,8 +17,8 @@ public class EnemyStateWander : EnemyState
     //El cangrejo se mueve con objetivos y pausas aleatorios
     public void UpdateState()
     {
-        //Si estamos cerca del punto de destino actual calculamos un nuevo punto aleatorio
-        if(enemy.agent.destination == null || enemy.agent.remainingDistance <= enemy.agent.stoppingDistance)
+        //Si estamos cerca del punto de destino actual calculamos un nuevo punto aleatorio (o se ha agotado el tiempo para ese destino)
+        if(currTargetTime <= 0 || enemy.agent.destination == null || enemy.agent.remainingDistance <= enemy.agent.stoppingDistance)
         {
             //Obtenemos una direccion aleatoria entre el angulo maximo escogido respecto al forward
             Vector3 direction =
@@ -31,6 +32,7 @@ public class EnemyStateWander : EnemyState
             Vector3 point = direction + enemy.agent.transform.position;
             point.y = enemy.transform.position.y;
             enemy.agent.destination = point;
+            currTargetTime = 5;
 
             //Cambiamos la velocidad a más lento para caminar
             enemy.agent.speed = enemy.slowSpeedMult * enemy.baseSpeed * enemy.size;
@@ -52,6 +54,7 @@ public class EnemyStateWander : EnemyState
         else
         {
             enemy.agent.isStopped = false;
+            currTargetTime -= Time.deltaTime;
         }
     }
 

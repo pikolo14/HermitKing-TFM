@@ -98,6 +98,10 @@ public class CrabController : MonoBehaviour
     public GameObject defenseParticles;
     public ParticleSystem dustParticles;
 
+    [Header("DEBUG")]
+    public bool debugSpawn = false;
+    public string debugIAState = "";
+
 
     protected virtual void Awake()
     {
@@ -146,7 +150,7 @@ public class CrabController : MonoBehaviour
     private void OnEnable()
     {
         //Generar con concha en ocasiones
-        if(Random.Range(0f,1f) < GameManager.gameManager.crabShellProp)
+        if(!debugSpawn && Random.Range(0f,1f) < GameManager.gameManager.crabShellProp)
         {
             //En el caso de que se cree con concha será de tipo aleatorio
             GameObject sh = Instantiate(GameManager.gameManager.shellPrefabs[Random.Range(0, GameManager.gameManager.shellPrefabs.Length)]);
@@ -165,13 +169,23 @@ public class CrabController : MonoBehaviour
         //Actualizamos el estado de la maquina en el que estemos situados actualmente
         currState.UpdateState();
         MoveLegs();
+
+        if (currState == attackState)
+            debugIAState = "attack";
+        else if (currState == wanderState)
+            debugIAState = "wander";
+        else if (currState == pursueState)
+            debugIAState = "pursue";
     }
 
     //Actualizar tamaño de escala del modelo del cangrejo
     public void UpdateCrabSize()
     {
-        body.localScale = initBodyScale * size * GameManager.gameManager.scaleFactor;
-        rb.mass = size;
+        if(!debugSpawn)
+        { 
+            body.localScale = initBodyScale * size * GameManager.gameManager.scaleFactor;
+            rb.mass = size;
+        }
     }
 
     protected void MoveLegs()
@@ -402,7 +416,7 @@ public class CrabController : MonoBehaviour
             Destroy(tipsEffectors.gameObject);
 
         //Generamos una nube de particulas si no se está destruyendo la instancia antes de cerrar el juego para evitar errores
-        if (!GameManager.isQuitting)
+        if (!debugSpawn && !GameManager.isQuitting)
         {
             Instantiate(deathParticles, transform.position, new Quaternion()).SetActive(true);
         }

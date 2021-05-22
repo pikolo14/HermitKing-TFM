@@ -6,6 +6,7 @@ public class AttackDetector : MonoBehaviour
 {
     //Evento para comunicar al attackController del atacante que se le ha dado a alguien
     public delegate void HitEvent(GameObject crab, Vector3 pos);
+    public AttackController controller;
     public event HitEvent HitCallback;
     public SphereCollider coll;
 
@@ -17,9 +18,10 @@ public class AttackDetector : MonoBehaviour
     //Detectamos si golpeamos a alguien
     private void OnTriggerStay(Collider other)
     {
-        //Si estamos en un enemigo y entramos en el cuerpo del jugador, dañamos al jugador
-        if (gameObject.CompareTag(Globals.tagEnemy) && other.CompareTag(Globals.tagPlayer))
+        //Si daña el enemigo al jugador o viceversa
+        if (controller.damage && (gameObject.CompareTag(Globals.tagEnemy) && other.CompareTag(Globals.tagPlayer) || (gameObject.CompareTag(Globals.tagPlayer) && other.CompareTag(Globals.tagEnemy))))
         {
+            Debug.Log("STAY IN ATTACK");
             try
             {
                 //Obtenemos el punto cercano a la superficie del collider de la pinza en la dirección en la que está el collider enemigo
@@ -27,14 +29,19 @@ public class AttackDetector : MonoBehaviour
                 dir = dir.normalized * coll.radius * 0.9f;
 
                 HitCallback(other.gameObject, dir+transform.position);
+                controller.damage = false;
             }
             catch { }
-            //PlayerCrabController player = other.GetComponentInParent<PlayerCrabController>();
-            //player.GetHit(attackDamage);
         }
-        //Si estamos en el cangrejo del jugador y entramos en el cuerpo de un enemigo, lo dañamos
-        else if (gameObject.CompareTag(Globals.tagPlayer) && other.CompareTag(Globals.tagEnemy))
-        {        
+    }
+
+    //Detectamos si golpeamos a alguien
+    private void OnTriggerEnter(Collider other)
+    {
+        //Si daña el enemigo al jugador o viceversa
+        if (controller.damage && (gameObject.CompareTag(Globals.tagEnemy) && other.CompareTag(Globals.tagPlayer) || (gameObject.CompareTag(Globals.tagPlayer) && other.CompareTag(Globals.tagEnemy))))
+        {
+            Debug.Log("ENTER IN ATTACK");
             try
             {
                 //Obtenemos el punto cercano a la superficie del collider de la pinza en la dirección en la que está el collider enemigo
@@ -42,10 +49,9 @@ public class AttackDetector : MonoBehaviour
                 dir = dir.normalized * coll.radius * 0.9f;
 
                 HitCallback(other.gameObject, dir + transform.position);
+                controller.damage = false;
             }
             catch { }
-            //CrabController enemy = other.GetComponentInParent<CrabController>();
-            //enemy.GetHit(attackDamage);
         }
     }
 

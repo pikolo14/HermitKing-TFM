@@ -118,86 +118,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   coll: {fileID: 1036855157869170584}
   type: 1
---- !u!195 &2366469489546969777
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3710959981140066923}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 360
-  m_StoppingDistance: 2
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 0
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
---- !u!114 &3307289228826261063
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3710959981140066923}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9a327e526919ef4ab71409958655dd7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackContr: {fileID: 0}
-  rb: {fileID: 0}
-  animator: {fileID: 0}
-  bodyColl: {fileID: 247677200691341368}
-  groundColl: {fileID: 1439034323264172909}
-  health: 0
-  size: 13.053082
-  shellPoint: {fileID: 9097558882147256094}
-  shell: {fileID: 0}
-  baseSpeed: 2
-  turnSmoothTime: 0.2
-  shellWeight: 0
-  maxWeight: 10
-  minSpeedMult: 0.2
-  maxSpeedMult: 1
-  attackMinDelay: 0.5
-  attackMaxDelay: 2
-  defenceDuration: 0.5
-  attackDist: 2
-  detectDist: 5
-  detectAngle: 40
-  agent: {fileID: 0}
-  slowSpeedMult: 0.5
-  wanderTargetMinDist: 2
-  wanderTargetMaxDist: 4
-  wanderTargetAngle: 180
-  attackRotation: 0.5
-  wanderWaitProbability: 0.8
-  wanderWaitMinTime: 0.5
-  wanderWaitMaxTime: 2
-  currTarget: {fileID: 0}
-  currTargetShell: {fileID: 0}
-  tipsEffectorsPrefab: {fileID: 6877466506046148952, guid: 400377e21a9971c43aa0adf6e8c0eed5, type: 3}
-  projectPointsTips:
-  - {fileID: 6812570249638185731}
-  - {fileID: 3575734276787586719}
-  - {fileID: 150938435774832722}
-  - {fileID: 8527276748638929289}
-  rigBuilder: {fileID: 9097558882547446788}
-  legMaxDist: 0.4
-  effectorMoveTime: 0.05
-  bodyHeight: 0.12
-  deathParticles: {fileID: 1660873708399190289}
-  hitParticles: {fileID: 3612114771801665252, guid: 0905e6227f71aba4782782142658d17b, type: 3}
-  defenseParticles: {fileID: 7054972888949649419, guid: 246f7057842e2fd498272fc394d39555, type: 3}
-  dustParticles: {fileID: 2362135206066892609}
 --- !u!1 &4422855306333465403
 GameObject:
   m_ObjectHideFlags: 0
@@ -257,6 +177,87 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   coll: {fileID: 5403479240168506875}
   type: 0
+--- !u!195 &2366469489546969777
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3710959981140066923}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 360
+  m_StoppingDistance: 2
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &3307289228826261063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3710959981140066923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9a327e526919ef4ab71409958655dd7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackContr: {fileID: 0}
+  rb: {fileID: 0}
+  animator: {fileID: 0}
+  bodyColl: {fileID: 247677200691341368}
+  groundColl: {fileID: 1439034323264172909}
+  health: 0
+  size: 4.169934
+  shellPoint: {fileID: 9097558882147256094}
+  shell: {fileID: 0}
+  baseSpeed: 2
+  turnSmoothTime: 0.2
+  shellWeight: 0
+  maxWeight: 10
+  minSpeedMult: 0.2
+  maxSpeedMult: 1
+  attackMinDelay: 0.5
+  attackMaxDelay: 2
+  defenceDuration: 0.5
+  attackDist: 2
+  detectDist: 5
+  detectAngle: 40
+  agent: {fileID: 0}
+  slowSpeedMult: 0.5
+  wanderTargetMinDist: 2
+  wanderTargetMaxDist: 4
+  wanderTargetAngle: 180
+  attackRotation: 1.5
+  wanderWaitProbability: 0.8
+  wanderWaitMinTime: 1
+  wanderWaitMaxTime: 2
+  currTarget: {fileID: 0}
+  currTargetShell: {fileID: 0}
+  tipsEffectorsPrefab: {fileID: 6877466506046148952, guid: 400377e21a9971c43aa0adf6e8c0eed5, type: 3}
+  projectPointsTips:
+  - {fileID: 6812570249638185731}
+  - {fileID: 3575734276787586719}
+  - {fileID: 150938435774832722}
+  - {fileID: 8527276748638929289}
+  rigBuilder: {fileID: 9097558882547446788}
+  legMaxDist: 0.4
+  effectorMoveTime: 0.05
+  bodyHeight: 0.12
+  deathParticles: {fileID: 1660873708399190289}
+  hitParticles: {fileID: 3612114771801665252, guid: 0905e6227f71aba4782782142658d17b, type: 3}
+  defenseParticles: {fileID: 7054972888949649419, guid: 246f7057842e2fd498272fc394d39555, type: 3}
+  dustParticles: {fileID: 2362135206066892609}
+  debugSpawn: 0
 --- !u!1001 &9097558883234345445
 PrefabInstance:
   m_ObjectHideFlags: 0
