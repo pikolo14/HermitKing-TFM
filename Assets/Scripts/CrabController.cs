@@ -98,6 +98,10 @@ public class CrabController : MonoBehaviour
     public GameObject defenseParticles;
     public ParticleSystem dustParticles;
 
+    [Header("SOUNDS")]
+    public AudioManager walkingSounds;
+    public AudioManager generalSounds;
+
     [Header("DEBUG")]
     public bool debugSpawn = false;
     public string debugIAState = "";
@@ -167,15 +171,19 @@ public class CrabController : MonoBehaviour
     private void Update()
     {
         //Actualizamos el estado de la maquina en el que estemos situados actualmente
-        currState.UpdateState();
-        MoveLegs();
+        //FIX: Evitamos movimientos de los agentes en pausa
+        if(!GameManager.gameManager.paused)
+        {
+            currState.UpdateState();
+            MoveLegs();
 
-        if (currState == attackState)
-            debugIAState = "attack";
-        else if (currState == wanderState)
-            debugIAState = "wander";
-        else if (currState == pursueState)
-            debugIAState = "pursue";
+            if (currState == attackState)
+                debugIAState = "attack";
+            else if (currState == wanderState)
+                debugIAState = "wander";
+            else if (currState == pursueState)
+                debugIAState = "pursue";
+        }
     }
 
     //Actualizar tamaño de escala del modelo del cangrejo
@@ -214,6 +222,7 @@ public class CrabController : MonoBehaviour
                     tipMovementCorr[i] = null;
                 }
                 tipMovementCorr[i] = StartCoroutine(EffectorDisplacement(tip, hit.point, effectorMoveTime, i));
+                walkingSounds.RandomPlay();
             }
 
             averageHeight += tip.position.y;
@@ -351,13 +360,13 @@ public class CrabController : MonoBehaviour
         //Comenzar periodo defensa
         defending = true;
         //DEBUG
-        Material mat = GetComponentInChildren<Renderer>().material;
-        Color prev = mat.color;
-        mat.color = Color.blue;
+        //Material mat = GetComponentInChildren<Renderer>().material;
+        //Color prev = mat.color;
+        //mat.color = Color.blue;
         yield return new WaitForSeconds(time);
 
         //Terminar periodo defensa
-        mat.color = prev;
+        //mat.color = prev;
         defending = false;
     }
 

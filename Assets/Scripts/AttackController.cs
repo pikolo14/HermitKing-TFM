@@ -58,17 +58,13 @@ public class AttackController : MonoBehaviour
         damage = true;
 
         //DEBUG
-        Material mat = transform.parent.GetComponentInChildren<Renderer>().material;
-        Color prev = mat.color;
-        mat.color = Color.red;
+        //Material mat = transform.parent.GetComponentInChildren<Renderer>().material;
+        //Color prev = mat.color;
+        //mat.color = Color.red;
 
         //Desactivamos el collider
         yield return new WaitForSeconds(attackDuration);
-        //yield return new WaitForEndOfFrame();
-        //yield return new WaitForEndOfFrame();
-        mat.color = prev;
-        //foreach (Collider c in colls)
-        //    c.enabled = false;
+        //mat.color = prev;
         damage = false;
 
         attacking = false;
