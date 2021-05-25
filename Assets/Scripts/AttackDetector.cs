@@ -26,7 +26,8 @@ public class AttackDetector : MonoBehaviour
             {
                 //Obtenemos el punto cercano a la superficie del collider de la pinza en la dirección en la que está el collider enemigo
                 Vector3 dir = other.transform.position - transform.position;
-                dir = dir.normalized * coll.radius * 0.9f;
+                dir.Normalize();
+                dir = dir * coll.bounds.extents.x * 0.9f;
 
                 HitCallback(other.gameObject, dir+transform.position);
                 controller.damage = false;
@@ -46,7 +47,8 @@ public class AttackDetector : MonoBehaviour
             {
                 //Obtenemos el punto cercano a la superficie del collider de la pinza en la dirección en la que está el collider enemigo
                 Vector3 dir = other.transform.position - transform.position;
-                dir = dir.normalized * coll.radius * 0.9f;
+                dir.Normalize();
+                dir = dir * coll.bounds.extents.x * 0.9f;
 
                 HitCallback(other.gameObject, dir + transform.position);
                 controller.damage = false;

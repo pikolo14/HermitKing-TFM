@@ -20,6 +20,7 @@ public class ShellController : MonoBehaviour
     public float maxSize;
 
     public Vector3 initScale;
+    public float initSize = 0;
 
     //Tiempo que se ignora al cangrejo despues de soltar la concha
     public float ignoreCollTime = 4;
@@ -37,12 +38,17 @@ public class ShellController : MonoBehaviour
     public bool habitable = true;
     bool explosionReady = false;
 
+    //SONIDO
+    public AudioManager audioManager;
+
 
     private void Awake()
     {
         //Suscribirse al evento de cambio de tamaño del jugador para cambiar la apariencia de la concha
         PlayerCrabController.SizeCallback += ctx => CheckAvailability(ctx);
+
         initScale = transform.localScale;
+        audioManager = GetComponentInChildren<AudioManager>();
     }
 
     // Start is called before the first frame update
@@ -55,9 +61,13 @@ public class ShellController : MonoBehaviour
         //Si no esta sobre un cangrejo se inicializa su tamaño aleatoriamente (si no se asigna manualmente)
         if(anchorPoint == null && size == 0)
         {
-            //Inicializar con un tamaño aleatorio
-            float ranSize = Random.Range(GameManager.gameManager.minShellSize, GameManager.gameManager.maxShellSize);
-            SetSize(ranSize);
+            float desiredSize = initSize;
+
+            //Si el tamaño indicado es 0 se inicializar con un tamaño aleatorio
+            if (initSize == 0)
+                desiredSize = Random.Range(GameManager.gameManager.minShellSize, GameManager.gameManager.maxShellSize);
+
+            SetSize(desiredSize);
         }
 
         //Preparamos material de la concha
@@ -137,7 +147,7 @@ public class ShellController : MonoBehaviour
     public void Launch(Vector3 force)
     {
         //Ignoramos durante el lanzamiento el suelo
-        StartCoroutine(IgnoreColliderTemporarily(GameObject.FindGameObjectWithTag(Globals.tagGround), 0.2f));
+        StartCoroutine(IgnoreColliderTemporarily(GameObject.FindGameObjectWithTag(Globals.tagGround), 0.15f));
         //Aplicamos la fuerza a la concha para lanzarla e indicamos que va a explotar al tocar algo
         rb.drag = 0;
         rb.AddForce(force, ForceMode.Impulse);
@@ -171,6 +181,7 @@ public class ShellController : MonoBehaviour
         if(explosionReady && !collision.collider.CompareTag(Globals.tagPlayer))
         {
             GetComponentInChildren<ExplosionController>().Explode(explosionDamage, explosionRadius);
+            AudioManager.mainManager.Play("Explosion");
             GetComponentInChildren<MeshRenderer>().enabled = false;
             Destroy(gameObject, 0.1f);
         }
@@ -179,7 +190,7 @@ public class ShellController : MonoBehaviour
     //Modificar la apariencia de la concha en funcion de la vida que quede
     public void SetCrackedMaterial(float cracked)
     {
-        Debug.Log(cracked);
+        //Debug.Log(cracked);
         Material material = new Material(rend.material);
         material.SetFloat("CrackedQuantity", cracked);
         rend.material = material;

@@ -147,6 +147,7 @@ public class PlayerCrabController : CrabController
             StartCoroutine(TempIgnoreColl(shell.gameObject));
             DropShell();
             auxShell.Launch(force);
+            AudioManager.mainManager.Play("Launch");
         }
     }
 
@@ -240,7 +241,10 @@ public class PlayerCrabController : CrabController
                 if(discomfort >= health)
                     DropShell();
                 else
+                {
                     shell.SetCrackedMaterial(1 - ((health - Mathf.Max(0, discomfort)) / (float)shell.health));
+                    shell.audioManager.Play("Crack");
+                }
             }
         }
     }

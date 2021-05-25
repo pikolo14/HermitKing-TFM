@@ -47,6 +47,7 @@ public class AttackController : MonoBehaviour
     public IEnumerator AttackDuration(float duration)
     {
         attacking = true;
+        controller.generalSounds.Play("Attack");
 
         //Animacion de ataque
         controller.animator.SetBool(Globals.inputAttack, true);

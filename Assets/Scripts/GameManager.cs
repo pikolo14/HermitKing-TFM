@@ -77,6 +77,7 @@ public class GameManager : MonoBehaviour
         enemyControllerPrefab = enemyPrefab.GetComponent<CrabController>();
 
         isQuitting = false;
+        AudioListener.volume = 1f;
     }
 
     //Pausar/despausar
@@ -91,13 +92,15 @@ public class GameManager : MonoBehaviour
             {
                 Time.timeScale = 1;
                 pauseMenu.SetActive(false);
+                AudioListener.volume = 1f;
             }
             //Poner pausa
             else
             {
                 Time.timeScale = 0;
-                
-                if(showMenu)
+                AudioListener.volume = 0f;
+
+                if (showMenu)
                 {
                     selectButtonPause.Select();
                     pauseMenu.SetActive(true);

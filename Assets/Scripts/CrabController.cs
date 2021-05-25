@@ -97,10 +97,14 @@ public class CrabController : MonoBehaviour
     public GameObject hitParticles;
     public GameObject defenseParticles;
     public ParticleSystem dustParticles;
+    public int minDrop, maxDrop;
+    public GameObject foodDrop; 
 
     [Header("SOUNDS")]
     public AudioManager walkingSounds;
     public AudioManager generalSounds;
+    public float maxMoveDelay = 0.1f;
+    private float moveDelay = 0;
 
     [Header("DEBUG")]
     public bool debugSpawn = false;
@@ -172,7 +176,7 @@ public class CrabController : MonoBehaviour
     {
         //Actualizamos el estado de la maquina en el que estemos situados actualmente
         //FIX: Evitamos movimientos de los agentes en pausa
-        if(!GameManager.gameManager.paused)
+        if(GameManager.gameManager == null || !GameManager.gameManager.paused)
         {
             currState.UpdateState();
             MoveLegs();
@@ -199,6 +203,7 @@ public class CrabController : MonoBehaviour
     protected void MoveLegs()
     {
         float averageHeight = 0;
+        bool moved = false;
 
         for (int i = 0; i<projectPointsTips.Length; i++)
         {
@@ -222,12 +227,34 @@ public class CrabController : MonoBehaviour
                     tipMovementCorr[i] = null;
                 }
                 tipMovementCorr[i] = StartCoroutine(EffectorDisplacement(tip, hit.point, effectorMoveTime, i));
-                walkingSounds.RandomPlay();
+
+                moved = true;
             }
 
             averageHeight += tip.position.y;
         }
         averageHeight /= projectPointsTips.Length;
+
+        //Si se acaba de mover una pata y no se esta reproduciendo sonido, se reproduce
+        if (moved && !walkingSounds.source.isPlaying)
+        {
+            walkingSounds.source.Play();
+            moveDelay = 0;
+        }
+        //Si no se ha movido durante un tiempo y se esta reproduciendo sonido, lo paramos
+        else if(walkingSounds.source.isPlaying)
+        { 
+            //Si se supera el tiempo limite, se para el sonido
+            if(moveDelay > maxMoveDelay)
+            {
+                walkingSounds.source.Pause();
+            }
+            //si no se sigue contando el tiempo del delay
+            else
+            {
+                moveDelay += Time.deltaTime;
+            }
+        }
 
         //Nivelar altura del ground collider para elevar del suelo en funcion de la posición de las patas
         Ray rayAux = new Ray(groundColl.transform.position, Vector3.down);
@@ -279,6 +306,7 @@ public class CrabController : MonoBehaviour
             ParticleSystem.MainModule _psm_main = go.GetComponent<ParticleSystem>().main;
             _psm_main.gravityModifierMultiplier *= Mathf.Max(size - 1.5f, 1);
             go.transform.position = hitPos;
+            AudioManager.mainManager.Play("DefenceHit");
         }
         //Si se le puede golpear...
         else if(hittable)
@@ -313,6 +341,7 @@ public class CrabController : MonoBehaviour
                 {
                     //Aumentar grietas visibles en la concha
                     shell.SetCrackedMaterial(1-((health - Mathf.Max(0,discomfort)) / (float)shell.health));
+                    shell.audioManager.Play("Crack");
                 }
 
             }
@@ -338,9 +367,16 @@ public class CrabController : MonoBehaviour
     protected virtual void Defeat()
     {
         Debug.Log("Un ermitaño ha muerto");
+
+        //Instanciar comida de recompensa
+        int nDrops = Random.Range(minDrop, maxDrop + 1);
+        for(int i = 0; i<nDrops; i++)
+        {
+            Instantiate(foodDrop, transform.position, Quaternion.identity);
+        }
+
         Destroy(gameObject);
     }
-
 
     //Activar defensa temporalmente
     public void Defence()
@@ -360,13 +396,13 @@ public class CrabController : MonoBehaviour
         //Comenzar periodo defensa
         defending = true;
         //DEBUG
-        //Material mat = GetComponentInChildren<Renderer>().material;
-        //Color prev = mat.color;
-        //mat.color = Color.blue;
+        Material mat = GetComponentInChildren<Renderer>().material;
+        Color prev = mat.color;
+        mat.color = Color.blue;
         yield return new WaitForSeconds(time);
 
         //Terminar periodo defensa
-        //mat.color = prev;
+        mat.color = prev;
         defending = false;
     }
 
@@ -389,6 +425,11 @@ public class CrabController : MonoBehaviour
                 if (_shell.gameObject.name == Globals.finalShell && this == PlayerCrabController.player)
                 {
                     GameManager.gameManager.Win();
+                    AudioManager.mainManager.Play("Win");
+                }
+                else
+                {
+                    generalSounds.Play("GetShell");
                 }
             }
         }
@@ -406,6 +447,7 @@ public class CrabController : MonoBehaviour
 
             //Dejar caer objeto concha
             shell.Drop();
+            generalSounds.Play("DropShell");
             shell = null;
         }
     }
