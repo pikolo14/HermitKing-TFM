@@ -216,7 +216,6 @@ public class CrabController : MonoBehaviour
 
             int layerMask = (1 << LayerMask.NameToLayer("Ground"));
             Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask);
-            //Debug.DrawLine(hit.point, hit.point + Vector3.up * 0.2f, Color.magenta);
 
             //Comprobamos si se supera el umbral de distancia desde la posicion actual de la punta hasta el punto proyectado
             float dist = Vector3.Distance(hit.point, tip.position);
@@ -283,13 +282,11 @@ public class CrabController : MonoBehaviour
         float currTime = 0;
         float multTime = 1 / time;//Multiplicar tiempo para que esté entre 0 y 1 al introducirlo en el lerp
         Vector3 origin = effector.position;
-        //yield return null;
 
         while(currTime < 1)
         {
             currTime += Time.deltaTime * multTime;
             effector.position = Vector3.Lerp(origin, target, currTime);
-            //yield return null;
             yield return new WaitForEndOfFrame();
         }
     }
@@ -403,14 +400,9 @@ public class CrabController : MonoBehaviour
 
         //Comenzar periodo defensa
         defending = true;
-        ////DEBUG
-        //Material mat = GetComponentInChildren<Renderer>().material;
-        //Color prev = mat.color;
-        //mat.color = Color.blue;
         yield return new WaitForSeconds(time);
 
         //Terminar periodo defensa
-        //mat.color = prev;
         defending = false;
         AudioManager.mainManager.Stop("Defence");
     }
@@ -517,6 +509,7 @@ public class CrabController : MonoBehaviour
         }
     }
 
+    //Suscribirse al evento de crecimiento del jugador para cambiar el color a rojo cuando sea mas grande y haga mas daño
     public void SubscribeSize()
     {
         PlayerCrabController.SizeCallback += ctx => SetColorSize(ctx);

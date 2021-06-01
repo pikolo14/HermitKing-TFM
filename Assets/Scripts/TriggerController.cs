@@ -9,7 +9,7 @@ public class TriggerController : MonoBehaviour
     [SerializeField]
     public EnemyState.TriggerType type;
 
-    // Start is called before the first frame update
+    
     void Start()
     {
         enemy = GetComponentInParent<CrabController>();

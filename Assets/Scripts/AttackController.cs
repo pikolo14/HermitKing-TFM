@@ -19,7 +19,6 @@ public class AttackController : MonoBehaviour
         //Nos suscribimos al evento de golpear a un cangrejo contrincante en los dos detectores
         foreach(Collider c in colls)
         {
-            //c.enabled = false;
             c.gameObject.GetComponent<AttackDetector>().HitCallback += HitCrab;
         }
 
@@ -54,18 +53,10 @@ public class AttackController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         //Activamos el collider de ataque
-        //foreach (Collider c in colls)
-        //    c.enabled = true;
         damage = true;
-
-        //DEBUG
-        //Material mat = transform.parent.GetComponentInChildren<Renderer>().material;
-        //Color prev = mat.color;
-        //mat.color = Color.red;
 
         //Desactivamos el collider
         yield return new WaitForSeconds(attackDuration);
-        //mat.color = prev;
         damage = false;
 
         attacking = false;
@@ -74,9 +65,6 @@ public class AttackController : MonoBehaviour
     //Devuelve si se está atacando
     public bool IsAttacking()
     {
-        //if(colls[0]!=null)
-        //    return colls[0].enabled;
-        //else return false;
         return attacking;
     }
 

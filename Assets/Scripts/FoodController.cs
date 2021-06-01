@@ -6,12 +6,12 @@ public class FoodController : MonoBehaviour
 {
     public float noDetectionTime = 1.5f;
 
-    // Start is called before the first frame update
     void Start()
     {
         StartCoroutine(NoDetectionCoroutine(noDetectionTime));
     }
 
+    //Corrutina para evitar que se coma la comida inmediatamente conforme se crea
     IEnumerator NoDetectionCoroutine(float time)
     {
         yield return new WaitForSeconds(time);

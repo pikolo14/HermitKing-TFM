@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class Globals : MonoBehaviour
 {
-    //GLOBAL VARIABLES
-
-
-
     //TAGS
     public static string tagPlayer = "Player";
     public static string tagEnemy = "Enemy";

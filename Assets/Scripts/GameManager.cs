@@ -17,8 +17,6 @@ public class GameManager : MonoBehaviour
     public GameObject[] shellPrefabs;
     public GameObject finalShell;
     public float distBetweenSpawns = 2f;
-    //public float enemyProportion = 0.06f;
-    //public float shellProportion = 0.04f;
     public int nEnemies, nShells, nFood;
     public Queue <GameObject> enemies;
 
@@ -78,7 +76,6 @@ public class GameManager : MonoBehaviour
 
         isQuitting = false;
         AudioListener.volume = 1f;
-
         AudioManager.mainManager.Play("Music");
     }
 
@@ -123,7 +120,6 @@ public class GameManager : MonoBehaviour
     void PrepareLevel()
     {
         Bounds bounds = spawnZoneColl.bounds;
-        //Vector2 zoneSize = new Vector2(bounds.size.x, bounds.size.z)*2;
 
         List<Vector2> points2D = Globals.GeneratePoissonDiscPoints(distBetweenSpawns, bounds);
         List<int> enemiesIndexes = new List<int>();
@@ -150,15 +146,6 @@ public class GameManager : MonoBehaviour
 
         //Generar comida (dejando huecos vacíos)
         GroupSpawn(nFood, foodPrefab, ref points2D, bounds);
-        //foreach (Vector2 point in points2D)
-        //{
-        //    Vector3 pos;
-        //    if(Globals.GetGroundPoint(point, bounds, out pos))
-        //    {
-        //        Quaternion rot = Quaternion.AngleAxis(Random.Range(0, 360), Vector3.up);
-        //        Instantiate(foodPrefab, pos, rot);
-        //    }
-        //}
     }
 
     public Queue<GameObject> GroupSpawn(int nObjects, GameObject prefab, ref List<Vector2> points2D, Bounds bounds)

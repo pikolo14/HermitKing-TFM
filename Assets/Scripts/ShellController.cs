@@ -25,7 +25,6 @@ public class ShellController : MonoBehaviour
     //Tiempo que se ignora al cangrejo despues de soltar la concha
     public float ignoreCollTime = 4;
     public float reoccupyDelay = 1;
-
     public GameObject ignoredCrab;
 
     //Punto del cangrejo en el que se debe colocar continuamente (evitamos escalar la concha con el cangrejo)
@@ -71,7 +70,6 @@ public class ShellController : MonoBehaviour
         }
 
         //Preparamos material de la concha
-        //CheckAvailability(PlayerCrabController.player.size);
         rend = GetComponentInChildren<Renderer>();
         SetCrackedMaterial(0);
 
@@ -167,12 +165,9 @@ public class ShellController : MonoBehaviour
 
     public IEnumerator IgnoreColliderTemporarily(GameObject ignored, float time)
     {
-        //Collider ignoredColl = ignored.GetComponent<Collider>();
-        //Physics.IgnoreCollision(coll, ignoredColl, true);
         coll.enabled = false;
         yield return new WaitForSeconds(time);
         coll.enabled = true;
-        //Physics.IgnoreCollision(coll, ignoredColl, false);
     }
 
     //Explotamos la concha al tocar cualquier superficie haciendo daño en area

@@ -7,25 +7,23 @@ public class AudioManager : MonoBehaviour
 {
     //Bateria de sonidos del objeto
     public Sound[] sounds;
-    //Se trata del controlador de sonidos independientes de la ubicacion de la fuente (principal)
+    //Se trata del controlador de sonidos independientes de la ubicacion de la fuente (principal) ?
     public bool ubiquitous = false;
     //Referencia estática al main audio manager para mayor comodidad
     public static AudioManager mainManager;
 
     public AudioSource source;
-
     public float playDelay = 0.2f;
     private float currDelay;
 
     void Awake()
     {
+        //Si el manager es ubicuo será el principal
         if(ubiquitous)
         {
             if (mainManager == null)
             {
                 mainManager = this;
-                //Mantenemos el sonido entre escenas
-                //DontDestroyOnLoad(gameObject);
             }
             else
                 return;    
@@ -47,12 +45,14 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    //Reproducir un sonido del array
     public void Play (string name)
     {
         Sound s = System.Array.Find(sounds, sound => sound.name == name);
         PlaySound(s);
     }
 
+    //Está un sonido reproduciendose?
     public bool IsPlaying(string name)
     {
         Sound s = System.Array.Find(sounds, sound => sound.name == name);
@@ -80,9 +80,11 @@ public class AudioManager : MonoBehaviour
 
     private void Update()
     {
+        //Evitar demasiados cambios de sonidos
         currDelay += Time.deltaTime;
     }
 
+    //Parar un sonido del array
     public void Stop (string name)
     {
         Sound s = System.Array.Find(sounds, sound => sound.name == name);

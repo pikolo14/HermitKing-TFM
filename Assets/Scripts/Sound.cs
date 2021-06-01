@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Clase que almacena las características de un sonido para que se puedan controlar desde el editor
+
 [System.Serializable]
 public class Sound
 {
+
     public string name;
 
     [Range(0f,1f)]

@@ -8,7 +8,6 @@ public class CreditsController : MonoBehaviour
 {
     public float backTime;
 
-    // Start is called before the first frame update
     void Start()
     {
         StartCoroutine(TimeCoroutine(backTime));

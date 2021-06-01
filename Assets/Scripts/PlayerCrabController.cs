@@ -21,6 +21,7 @@ public class PlayerCrabController : CrabController
     public float jumpAngle = 40;
     private bool jumpPressed = false;
     private float jumpPressedTime = 0;
+    public float jumpingTime = 0;
 
     //Lanzamiento concha
     [Header("SHELL LAUNCH")]
@@ -33,13 +34,12 @@ public class PlayerCrabController : CrabController
     private Vector2 inputMove = new Vector2(), lookCamera = new Vector2();
     private float[] orbitsRads, orbitsHeights;
 
+    public int foodCount = 0;
+
     //Evento para comunicar a las conchas que se ha aumentado de tamaño
     public delegate void SizeEvent(float size);
     public static event SizeEvent SizeCallback;
 
-    public int foodCount = 0;
-
-    public float jumpingTime = 0;
 
 
     protected override void Awake()
@@ -88,11 +88,6 @@ public class PlayerCrabController : CrabController
             foreach (var d in SizeCallback.GetInvocationList())
                 SizeCallback  -= (d as SizeEvent);
     }
-
-    //public int GetCallbackSize()
-    //{
-    //    return SizeCallback.GetInvocationList().Length;
-    //}
 
 
     private void Update()
@@ -365,8 +360,6 @@ public class PlayerCrabController : CrabController
 
     public float GetAxisCustom(string axisName)
     {
-        // LookCamera.Normalize();
-
         if (axisName == "Camera X")
         {
             if (lookCamera.x > deadZoneX || lookCamera.x < -deadZoneX) // To stabilise Cam and prevent it from rotating when LookCamera.x value is between deadZoneX and - deadZoneX
