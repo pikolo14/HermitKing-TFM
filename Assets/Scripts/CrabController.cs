@@ -14,6 +14,7 @@ public class CrabController : MonoBehaviour
     public Animator animator;
     public CapsuleCollider bodyColl;
     public BoxCollider groundColl;
+    public GameObject[] bodyRenderers;
 
     //SALUD
     [Header("HEALTH")]
@@ -24,6 +25,7 @@ public class CrabController : MonoBehaviour
     public float size = 0;
     protected Vector3 initBodyScale;
     protected Transform body;
+    public Color bigTintColor;
     
     //CONCHA
     [Header("SHELL")]
@@ -104,7 +106,7 @@ public class CrabController : MonoBehaviour
     public AudioManager walkingSounds;
     public AudioManager generalSounds;
     public float maxMoveDelay = 0.1f;
-    private float moveDelay = 0;
+    protected float moveDelay = 0;
 
     [Header("DEBUG")]
     public bool debugSpawn = false;
@@ -235,26 +237,7 @@ public class CrabController : MonoBehaviour
         }
         averageHeight /= projectPointsTips.Length;
 
-        //Si se acaba de mover una pata y no se esta reproduciendo sonido, se reproduce
-        if (moved && !walkingSounds.source.isPlaying)
-        {
-            walkingSounds.source.Play();
-            moveDelay = 0;
-        }
-        //Si no se ha movido durante un tiempo y se esta reproduciendo sonido, lo paramos
-        else if(walkingSounds.source.isPlaying)
-        { 
-            //Si se supera el tiempo limite, se para el sonido
-            if(moveDelay > maxMoveDelay)
-            {
-                walkingSounds.source.Pause();
-            }
-            //si no se sigue contando el tiempo del delay
-            else
-            {
-                moveDelay += Time.deltaTime;
-            }
-        }
+        CheckWalkingSound(moved);
 
         //Nivelar altura del ground collider para elevar del suelo en funcion de la posición de las patas
         Ray rayAux = new Ray(groundColl.transform.position, Vector3.down);
@@ -267,6 +250,30 @@ public class CrabController : MonoBehaviour
         else
         {
             agent.baseOffset = Mathf.Clamp((bodyHeight * size + (averageHeight - hitAux.point.y)), 0, bodyHeight * size * 2f) * 2f;
+        }
+    }
+
+    protected virtual void CheckWalkingSound(bool moved)
+    {
+        //Si se acaba de mover una pata y no se esta reproduciendo sonido, se reproduce
+        if (moved && (GameManager.gameManager!=null &&!GameManager.gameManager.finished) && !walkingSounds.source.isPlaying)
+        {
+            walkingSounds.source.Play();
+            moveDelay = 0;
+        }
+        //Si no se ha movido durante un tiempo y se esta reproduciendo sonido, lo paramos
+        else if (walkingSounds.source.isPlaying)
+        {
+            //Si se supera el tiempo limite, se para el sonido
+            if (moveDelay > maxMoveDelay)
+            {
+                walkingSounds.source.Pause();
+            }
+            //si no se sigue contando el tiempo del delay
+            else
+            {
+                moveDelay += Time.deltaTime;
+            }
         }
     }
 
@@ -389,21 +396,23 @@ public class CrabController : MonoBehaviour
 
     protected IEnumerator DefenceDuration(float time)
     {
-        //Aimación de defensa
+        //Aimación y sonido de defensa
         animator.SetBool(Globals.inputDefence, true);
+        AudioManager.mainManager.Play("Defence");
         yield return new WaitForSeconds(0.04f);
 
         //Comenzar periodo defensa
         defending = true;
-        //DEBUG
-        Material mat = GetComponentInChildren<Renderer>().material;
-        Color prev = mat.color;
-        mat.color = Color.blue;
+        ////DEBUG
+        //Material mat = GetComponentInChildren<Renderer>().material;
+        //Color prev = mat.color;
+        //mat.color = Color.blue;
         yield return new WaitForSeconds(time);
 
         //Terminar periodo defensa
-        mat.color = prev;
+        //mat.color = prev;
         defending = false;
+        AudioManager.mainManager.Stop("Defence");
     }
 
     //Coger una nueva concha
@@ -460,6 +469,9 @@ public class CrabController : MonoBehaviour
 
     private void OnDestroy()
     {
+        //Desubscribir todos los eventos del callback para evitar errores
+        PlayerCrabController.SizeCallback -= ctx => SetColorSize(ctx);
+
         rigBuilder.enabled = false;
         Destroy(agent);
         Destroy(rigBuilder);
@@ -470,6 +482,43 @@ public class CrabController : MonoBehaviour
         if (!debugSpawn && !GameManager.isQuitting)
         {
             Instantiate(deathParticles, transform.position, new Quaternion()).SetActive(true);
+            AudioManager.mainManager.Play("Death");
         }
+    }
+
+    //Cambiamos el color a más rojo si es más grande que el jugador
+    public void SetColorSize(float _size)
+    {
+        Color tint = Color.white;
+
+        //Si le puede hacer más de uno de daño al golpearle al jugador...
+        if ((size - _size) / GameManager.gameManager.sizeDiffAttackStep >= 1)
+            tint = bigTintColor;
+
+        //Si hay que cambiar el color, se cambia en todos los modelos afectados
+        if(bodyRenderers[0]!=null && tint != bodyRenderers[0].GetComponent<Renderer>().material.color)
+        {
+            foreach (GameObject go in bodyRenderers)
+            {
+                Renderer r = go.GetComponent<Renderer>();
+                if(r != null)
+                {
+                    Material mat = r.material;
+                    mat.color = tint;
+                }
+
+                Renderer[] rChilds = go.GetComponentsInChildren<Renderer>();
+                foreach(Renderer child in rChilds)
+                {
+                    Material mChild = child.material;
+                    mChild.color = tint;
+                }
+            }
+        }
+    }
+
+    public void SubscribeSize()
+    {
+        PlayerCrabController.SizeCallback += ctx => SetColorSize(ctx);
     }
 }

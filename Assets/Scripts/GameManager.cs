@@ -78,6 +78,8 @@ public class GameManager : MonoBehaviour
 
         isQuitting = false;
         AudioListener.volume = 1f;
+
+        AudioManager.mainManager.Play("Music");
     }
 
     //Pausar/despausar
@@ -92,18 +94,26 @@ public class GameManager : MonoBehaviour
             {
                 Time.timeScale = 1;
                 pauseMenu.SetActive(false);
-                AudioListener.volume = 1f;
+                if(showMenu)
+                    AudioListener.volume = 1f;
             }
             //Poner pausa
             else
             {
                 Time.timeScale = 0;
-                AudioListener.volume = 0f;
 
                 if (showMenu)
                 {
                     selectButtonPause.Select();
                     pauseMenu.SetActive(true);
+                    AudioListener.volume = 0f;
+                }
+                else
+                {
+                    //Parar todos los sonidos de la escena al finalizar el juego
+                    AudioSource[] allAudioSources = FindObjectsOfType<AudioSource> ();
+                    foreach ( AudioSource audioS in allAudioSources)
+                        audioS.Stop();
                 }
             }
         }
@@ -123,12 +133,16 @@ public class GameManager : MonoBehaviour
         fsController.SetSize(maxShellSize + shellSizeTolerance);
 
         //Generar enemigos
-        //int nEnemies = Mathf.FloorToInt(points2D.Count * enemyProportion);
         enemyPrefab.GetComponent<CrabController>().size = 0;
         enemies = GroupSpawn(nEnemies, enemyPrefab, ref points2D, bounds);
+        foreach (GameObject go in enemies)
+        {
+            //Suscribirse al evento de cambio de tamaño del jugador para pasar a rojo cuando sea mayor que el jugador
+            CrabController contr = go.GetComponent<CrabController>();
+            contr.SubscribeSize();
+        }
 
         //Generar conchas de distintos tipos a partes iguales
-        //int nShells = Mathf.FloorToInt(points2D.Count * shellProportion /shellPrefabs.Length);
         foreach(GameObject shell in shellPrefabs)
         {
             GroupSpawn(nShells/shellPrefabs.Length, shell, ref points2D, bounds);
@@ -235,7 +249,12 @@ public class GameManager : MonoBehaviour
             enemyPrefab.GetComponent<CrabController>().size = Random.Range(size, size + maxSizeDiff);
             GameObject spawned = SimpleSpawn(enemyPrefab, spawnZoneColl.bounds);
             if(spawned != null)
+            {
                 enemies.Enqueue(spawned);
+                //Suscribirse al evento de cambio de tamaño del jugador para pasar a rojo cuando sea mayor que el jugador
+                CrabController contr = spawned.GetComponent<CrabController>();
+                contr.SubscribeSize();
+            }
         }
     }
 
@@ -247,6 +266,7 @@ public class GameManager : MonoBehaviour
         finished = true;
         loseScreen.SetActive(true);
         selectButtonLose.Select();
+        AudioManager.mainManager.Play("Lose");
     }
 
     //Mostrar pantalla de victoria pausando el tiempo
@@ -256,6 +276,7 @@ public class GameManager : MonoBehaviour
         finished = true;
         victoryScreen.SetActive(true);
         selectButtonWin.Select();
+        AudioManager.mainManager.Play("Win");
     }
 
     private void OnDestroy()

@@ -85,6 +85,7 @@ MonoBehaviour:
   minSize: 0
   maxSize: 100
   initScale: {x: 0, y: 0, z: 0}
+  initSize: 0
   ignoreCollTime: 2.5
   reoccupyDelay: 1.5
   ignoredCrab: {fileID: 0}
@@ -198,9 +199,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sounds:
   - name: Crack
-    volume: 0.7
+    volume: 0.9
     pitch: 1
-    clip: {fileID: 8300000, guid: e4334e4af6fa63a419cdfd6113a5635c, type: 3}
+    clip: {fileID: 8300000, guid: 2a512d49257a8b3449b5aff9da86c4ea, type: 3}
     loop: 0
     source: {fileID: 0}
   - name: Explosion

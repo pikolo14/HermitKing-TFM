@@ -89,6 +89,12 @@ public class PlayerCrabController : CrabController
                 SizeCallback  -= (d as SizeEvent);
     }
 
+    //public int GetCallbackSize()
+    //{
+    //    return SizeCallback.GetInvocationList().Length;
+    //}
+
+
     private void Update()
     {
         if(shell != null)
@@ -96,6 +102,8 @@ public class PlayerCrabController : CrabController
             if(jumpPressed)
             {
                 jumpPressedTime += Time.deltaTime;
+                if (!AudioManager.mainManager.IsPlaying("Charge"))
+                    AudioManager.mainManager.Play("Charge"); 
             }
             else if(jumpPressedTime > 0)
             {
@@ -130,6 +138,21 @@ public class PlayerCrabController : CrabController
         DropShell();
         jumpingTime = 0.5f;
         rb.AddForce(force, ForceMode.Impulse);
+
+        //Parar sonido de carga
+        AudioManager.mainManager.Stop("Charge");
+
+        //Reproducir sonido salto al mantener un poco
+        if(time > maxJumpTime*0.2f)
+        {
+            AudioManager.mainManager.Play("Jump");
+        }
+
+        //Pausar sonido caminar
+        if (walkingSounds.source.isPlaying)
+        {
+            walkingSounds.source.Pause();
+        }
     }
 
     //Lanzamiento hacia adelante de la concha
@@ -205,14 +228,48 @@ public class PlayerCrabController : CrabController
         {
             //Evitar que el cangrejo se mueva solo cuando no se tocan los controles, como en una pendiente
             rb.velocity = new Vector3(0,rb.velocity.y, 0);
+
             if (dustParticles.isPaused)
                 dustParticles.Play();
         }
         else
         {
             Debug.DrawRay(transform.position, Vector3.down, Color.red);
-            if(!dustParticles.isPaused)
+
+            if (walkingSounds.source.isPlaying)
+                walkingSounds.source.Pause();
+
+            if (!dustParticles.isPaused)
                 dustParticles.Pause();
+        }
+    }
+
+    protected override void CheckWalkingSound(bool moved)
+    {
+        //Si esta grounded y no se está en mitad de un salto
+        RaycastHit hit;
+        Ray ray = new Ray(transform.position, Vector3.down);
+        int layer = 1 << 9;
+
+        //Si se acaba de mover una pata y no se esta reproduciendo sonido, se reproduce
+        if (moved && !walkingSounds.source.isPlaying && Physics.Raycast(ray, out hit, bodyHeight * size * 2f, layer))
+        {
+            walkingSounds.source.Play();
+            moveDelay = 0;
+        }
+        //Si no se ha movido durante un tiempo y se esta reproduciendo sonido, lo paramos
+        else if (walkingSounds.source.isPlaying)
+        {
+            //Si se supera el tiempo limite, se para el sonido
+            if (moveDelay > maxMoveDelay)
+            {
+                walkingSounds.source.Pause();
+            }
+            //si no se sigue contando el tiempo del delay
+            else
+            {
+                moveDelay += Time.deltaTime;
+            }
         }
     }
 
@@ -226,6 +283,10 @@ public class PlayerCrabController : CrabController
     {
         size += GameManager.gameManager.foodSizeIncr;
         Debug.Log(foodCount++ +", "+ size);
+
+        //Sonido de comer
+        AudioManager.mainManager.Play("Eat");
+
         //Evitamos que crezca demasiado y no quepa en la concha final
         size = Mathf.Clamp(size, 0, GameManager.gameManager.maxShellSize + GameManager.gameManager.shellSizeTolerance);
         UpdateCrabSize();
